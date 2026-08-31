@@ -1,48 +1,249 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> YouTube premium </title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>البحث عن الفيديوهات</title>
+
+    <!-- ========================================== -->
+    <!-- 1. كود التصميم (CSS)                      -->
+    <!-- ========================================== -->
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: #fff; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        input { width: 70%; padding: 10px; border-radius: 5px; border: none; font-size: 16px; }
-        button { padding: 10px 20px; border-radius: 5px; border: none; background-color: #ff0000; color: #fff; font-size: 16px; cursor: pointer; }
-        .video-container { margin-top: 20px; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0f0f0f;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1px solid #303030;
+            border-radius: 20px;
+            background-color: #121212;
+            color: #fff;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #1c62b9;
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #212121;
+            border-radius: 12px;
+            margin-top: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #303030;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background-color: #383838;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .video-card {
+            background-color: #181818;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .video-card:hover {
+            transform: scale(1.03);
+        }
+
+        .video-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+
+        .video-card h3 {
+            font-size: 14px;
+            padding: 10px;
+            line-height: 1.4;
+            color: #f1f1f1;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Premuim Player</h2>
-        <input type="text" id="ytUrl" placeholder="Video link here ...">
-        <button onclick="playVideo()">Play</button>
-        <div class="video-container" id="player"></div>
+
+    <!-- ========================================== -->
+    <!-- 2. واجهة المستخدم (HTML)                   -->
+    <!-- ========================================== -->
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="ابحث في يوتيوب..." autocomplete="off">
+        </div>
+        <div id="suggestions-box" class="suggestions-dropdown"></div>
     </div>
 
+    <div id="results-container" class="results-grid"></div>
+
+    <!-- ========================================== -->
+    <!-- 3. كود المفتاح والبيانات (CONFIG)           -->
+    <!-- ========================================== -->
     <script>
-        function playVideo() {
-            let input = document.getElementById('ytUrl').value;
-            let videoId = '';
-            
-            // استخراج ID الفيديو من الرابط
-            if (input.includes('v=')) {
-                videoId = input.split('v=')[1].split('&')[0];
-            } else if (input.includes('youtu.be/')) {
-                videoId = input.split('youtu.be/')[1].split('?')[0];
-            } else {
-                videoId = input; // إذا دخل الـ ID مباشرة
+        const CONFIG = {
+            YOUTUBE_API_KEY: 'YOUR_YOUTUBE_API_KEY_HERE' // حط المفتاح تاعك هنا
+        };
+    </script>
+
+    <!-- ========================================== -->
+    <!-- 4. كود الاتصال بـ API (API LOGIC)           -->
+    <!-- ========================================== -->
+    <script>
+        // دالة جلب الاقتراحات (Suggestions)
+        async function fetchSuggestions(query) {
+            if (!query.trim()) return [];
+
+            const proxyUrl = 'https://api.allorigins.win/raw?url=';
+            const suggestUrl = `https://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=${encodeURIComponent(query)}`;
+
+            try {
+                const response = await fetch(proxyUrl + encodeURIComponent(suggestUrl));
+                const data = await response.json();
+                return data[1] || [];
+            } catch (error) {
+                console.error("خطأ في جلب الاقتراحات:", error);
+                return [];
+            }
+        }
+
+        // دالة البحث عن الفيديوهات بـ API Key
+        async function searchYouTube(query) {
+            if (!query.trim()) return [];
+
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${CONFIG.YOUTUBE_API_KEY}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data.items || [];
+            } catch (error) {
+                console.error("خطأ في جلب النتائج:", error);
+                return [];
+            }
+        }
+    </script>
+
+    <!-- ========================================== -->
+    <!-- 5. كود التفاعل والربط (APP LOGIC)          -->
+    <!-- ========================================== -->
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const suggestionsBox = document.getElementById('suggestions-box');
+        const resultsContainer = document.getElementById('results-container');
+
+        // الاستماع للكتابة في مربع البحث
+        searchInput.addEventListener('input', async (e) => {
+            const query = e.target.value;
+
+            if (!query.trim()) {
+                suggestionsBox.style.display = 'none';
+                return;
             }
 
-            if (videoId) {
-                // استخدام youtube-nocookie لزيادة نسبة تخطي الحظر
-                document.getElementById('player').innerHTML = 
-                    `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
+            const suggestions = await fetchSuggestions(query);
+
+            suggestionsBox.innerHTML = '';
+            if (suggestions.length > 0) {
+                suggestionsBox.style.display = 'block';
+                suggestions.forEach(text => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = text;
+                    item.onclick = () => {
+                        searchInput.value = text;
+                        suggestionsBox.style.display = 'none';
+                        executeSearch(text);
+                    };
+                    suggestionsBox.appendChild(item);
+                });
             } else {
-                alert('الرابط غير صحيح!');
+                suggestionsBox.style.display = 'none';
             }
+        });
+
+        // إخفاء القائمة عند النقر في أي مكان خارج المربع
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // دالة عرض النتائج
+        async function executeSearch(query) {
+            resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">جاري البحث...</p>';
+            const videos = await searchYouTube(query);
+
+            resultsContainer.innerHTML = '';
+            if (videos.length === 0) {
+                resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">لم يتم العثور على نتائج.</p>';
+                return;
+            }
+
+            videos.forEach(video => {
+                const title = video.snippet.title;
+                const videoId = video.id.videoId;
+                const thumbnail = video.snippet.thumbnails.medium.url;
+
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.innerHTML = `
+                    <img src="${thumbnail}" alt="${title}">
+                    <h3>${title}</h3>
+                `;
+                card.onclick = () => {
+                    // افتح الفيديو ولا شغلوا فـ Player تاعك
+                    window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                };
+                resultsContainer.appendChild(card);
+            });
         }
     </script>
 </body>
