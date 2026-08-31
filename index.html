@@ -164,7 +164,7 @@
             document.getElementById('suggestions').style.display = 'none';
             document.getElementById('sectionTitle').innerText = `نتائج البحث عن: "${query}"`;
             
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`;
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${AIzaSyDe5exhD_PLnqgodPRN53Nse-36uw8SuQc}`;
             
             try {
                 const res = await fetch(url);
@@ -223,7 +223,7 @@
                 grid.className = "video-grid";
             }
 
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`;
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${AIzaSyDe5exhD_PLnqgodPRN53Nse-36uw8SuQc}`;
             
             try {
                 const res = await fetch(url);
