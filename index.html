@@ -29,9 +29,24 @@
 
         main { flex: 1; padding: 20px; }
         
-        .player-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px; }
-        .player-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+       .player-container {
+    position: relative;
+    width: 100%;            /* Scales smoothly up to 100% of its parent column */
+    max-width: 100%;        /* Prevents it from breaking out of the layout */
+    padding-bottom: 56.25%; /* Keeps your exact 16:9 percentage ratio */
+    height: 0;              /* Required for the percentage padding trick to work */
+    margin-bottom: 15px;
+}
 
+.player-container iframe {
+    position: absolute;     /* Pins the video inside the padded box */
+    top: 0;
+    left: 0;
+    width: 100%;            /* Forces video to stretch to container width */
+    height: 100%;           /* Forces video to stretch to container height */
+    border: none;
+}
+        
         .video-info { margin-bottom: 25px; }
         .video-title { font-size: 18px; margin-bottom: 8px; }
 
