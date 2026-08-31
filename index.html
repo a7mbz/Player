@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Player</title>
+    <title>منصة يوتيوب الخصوصية</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background: #0f0f0f; color: #fff; display: flex; flex-direction: column; min-height: 100vh; }
@@ -29,27 +29,9 @@
 
         main { flex: 1; padding: 20px; }
         
-    .player-container {
-    position: relative;
-    width: 100%;            
-    max-width: 800px;     
-    min-width: 320px;     
-    aspect-ratio: 16 / 9; 
-    margin-bottom: 25px;
-    resize: both;        
-    overflow: auto;      
-}
+        .player-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px; }
+        .player-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-.player-container iframe {
-    position: absolute;     
-    top: 0;
-    left: 0;
-    width: 100%;            
-    height: 100%;           
-    border: none;
-}
-
-        
         .video-info { margin-bottom: 25px; }
         .video-title { font-size: 18px; margin-bottom: 8px; }
 
@@ -164,7 +146,7 @@
             document.getElementById('suggestions').style.display = 'none';
             document.getElementById('sectionTitle').innerText = `نتائج البحث عن: "${query}"`;
             
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${AIzaSyDe5exhD_PLnqgodPRN53Nse-36uw8SuQc}`;
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`;
             
             try {
                 const res = await fetch(url);
@@ -223,7 +205,7 @@
                 grid.className = "video-grid";
             }
 
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${AIzaSyDe5exhD_PLnqgodPRN53Nse-36uw8SuQc}`;
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`;
             
             try {
                 const res = await fetch(url);
