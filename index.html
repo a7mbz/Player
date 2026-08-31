@@ -1,47 +1,64 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> YouTube premium </title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>YouTube Premium Player (Agent Edition)</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: #fff; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        input { width: 70%; padding: 10px; border-radius: 5px; border: none; font-size: 16px; }
-        button { padding: 10px 20px; border-radius: 5px; border: none; background-color: #ff0000; color: #fff; font-size: 16px; cursor: pointer; }
-        .video-container { margin-top: 20px; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; text-align: center; background: #121212; color: #e0e0e0; }
+        input { width: 80%; padding: 12px; font-size: 16px; margin: 10px 0; border: 1px solid #333; border-radius: 6px; background: #1e1e1e; color: #fff; }
+        button { padding: 12px 24px; font-size: 16px; background: #ff0000; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #cc0000; }
+        .video-container { position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; margin-top: 30px; display: none; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Premuim Player</h2>
-        <input type="text" id="ytUrl" placeholder="Video link here ...">
-        <button onclick="playVideo()">Play</button>
-        <div class="video-container" id="player"></div>
+
+    <h1>Premium Player</h1>
+    <p>Watch YouTube videos without cookies, tracking profiles, or intrusive sidebar traps:</p>
+    
+    <input type="text" id="videoInput" placeholder="Paste standard YouTube link, Shorts, or 11-digit ID...">
+    <br>
+    <button onclick="loadVideoFromInput()">Play</button>
+
+    <div class="video-container" id="playerContainer">
+        <iframe id="videoPlayer" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
     <script>
-        function playVideo() {
-            let input = document.getElementById('ytUrl').value;
-            let videoId = '';
-            
-            // استخراج ID الفيديو من الرابط
-            if (input.includes('v=')) {
-                videoId = input.split('v=')[1].split('&')[0];
-            } else if (input.includes('youtu.be/')) {
-                videoId = input.split('youtu.be/')[1].split('?')[0];
-            } else {
-                videoId = input; // إذا دخل الـ ID مباشرة
-            }
+        function extractVideoID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match.length === 11) ? match : null;
+        }
 
+        function embedVideo(id) {
+            if (!id) return;
+            const player = document.getElementById('videoPlayer');
+            const container = document.getElementById('playerContainer');
+            player.src = `https://youtube-nocookie.com{id}?rel=0&autoplay=1`;
+            container.style.display = 'block';
+        }
+
+        function loadVideoFromInput() {
+            const inputVal = document.getElementById('videoInput').value.trim();
+            const videoId = inputVal.length === 11 ? inputVal : extractVideoID(inputVal);
+            
             if (videoId) {
-                // استخدام youtube-nocookie لزيادة نسبة تخطي الحظر
-                document.getElementById('player').innerHTML = 
-                    `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
+                embedVideo(videoId);
+                window.history.pushState({}, '', `?yt=${videoId}`);
             } else {
-                alert('الرابط غير صحيح!');
+                alert('Invalid URL or Video ID. Please check your link.');
+            }
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ytParam = urlParams.get('yt');
+            if (ytParam) {
+                embedVideo(ytParam);
+                document.getElementById('videoInput').value = ytParam;
             }
         }
     </script>
