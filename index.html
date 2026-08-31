@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Video Workspace</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --container-bg: #1a1a1e;
+            --primary-color: #ff0000;
+            --text-color: #ffffff;
+            --text-secondary: #aaaaaa;
+            --accent-color: #29292e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--container-bg);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--accent-color);
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            width: 50%;
+            max-width: 600px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--accent-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #cc0000;
+        }
+
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .video-area {
+            flex: 3;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .placeholder-text {
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            background-color: var(--container-bg);
+            border-left: 1px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--accent-color);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .playlist {
+            flex: 1;
+            overflow-y: auto;
+            list-style: none;
+        }
+
+        .playlist-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--accent-color);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+
+        .playlist-item:hover {
+            background-color: var(--accent-color);
+        }
+
+        .playlist-item.active {
+            background-color: rgba(255, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .item-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .item-duration {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                max-width: 100%;
+                min-width: 100%;
+                height: 35vh;
+            }
+            header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .input-container {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Agent YTB Player</h1>
+        <div class="input-container">
+            <input type="text" id="videoInput" placeholder="Paste YouTube link or Video ID here...">
+            <button onclick="loadCustomVideo()">Load</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <div class="video-area" id="videoArea">
+            <div class="placeholder-text" id="placeholder">
+                <p>No video playing.</p>
+                <p style="font-size: 0.85rem; margin-top: 5px;">Select a video from the sidebar or enter a link above.</p>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-header">Team Training Playlist</div>
+            <ul class="playlist" id="playlist">
+                <!-- Items injected by JS -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Predefined team videos
+        const initialPlaylist = [
+            { id: "dQw4w9WgXcQ", title: "1. Standard Onboarding & Tool Overview" },
+            { id: "9bZkp7q19f0", title: "2. Customer Service Communication Basics" },
+            { id: "kJQP7kiw5Fk", title: "3. Conflict Resolution Protocols" }
+        ];
+
+        const videoArea = document.getElementById('videoArea');
+        const playlistContainer = document.getElementById('playlist');
+        const videoInput = document.getElementById('videoInput');
+
+        // Extract 11 character YouTube ID
+        function extractVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : url.trim();
+        }
+
+        function playVideo(id, element = null) {
+            // Update active styling in sidebar
+            document.querySelectorAll('.playlist-item').forEach(item => item.classList.remove('active'));
+            if (element) {
+                element.classList.add('active');
+            }
+
+            // Render IFrame player
+            videoArea.innerHTML = `
+                <div class="video-wrapper">
+                    <iframe 
+                        src="https://youtube.com{id}?autoplay=1&rel=0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            `;
+        }
+
+        function loadCustomVideo() {
+            const value = videoInput.value;
+            if (!value) return;
+
+            const videoId = extractVideoId(value);
+            
+            if (videoId.length === 11) {
+                playVideo(videoId);
+                
+                // Optional: Append custom video dynamically to list
+                const newItem = { id: videoId, title: `Custom Video (${videoId})` };
+                addPlaylistItem(newItem, false);
+                videoInput.value = '';
+            } else {
+                alert('Please enter a valid YouTube URL or an 11-digit Video ID.');
+            }
+        }
+
+        function addPlaylistItem(video, isPredefined) {
+            const li = document.createElement('li');
+            li.className = 'playlist-item';
+            li.innerHTML = `
+                <span class="item-title">${video.title}</span>
+                <span class="item-duration">${isPredefined ? 'Team Resource' : 'User Added'}</span>
+            `;
+            li.onclick = () => playVideo(video.id, li);
+            playlistContainer.appendChild(li);
+        }
+
+        // Initialize playlist UI
+        function init() {
+            initialPlaylist.forEach(video => addPlaylistItem(video, true));
+            
+            // Allow pressing Enter key in the text input box
+            videoInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    loadCustomVideo();
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
