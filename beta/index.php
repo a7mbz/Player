@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Player - Search & Suggestions</title>
+    <title>YouTube premium</title>
 
 <!-- ========================================================================= -->
 <!-- 1. STYLES & LAYOUT (CSS)                                                 -->
