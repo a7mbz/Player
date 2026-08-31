@@ -1,230 +1,49 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة يوتيوب الخصوصية</title>
+    <title> YouTube premium </title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background: #0f0f0f; color: #fff; display: flex; flex-direction: column; min-height: 100vh; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0f0f0f; border-bottom: 1px solid #272727; position: sticky; top: 0; z-index: 100; }
-        .logo { color: #ff0000; font-size: 20px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 5px; }
-        .logo span { color: #fff; }
-        
-        .search-box { position: relative; width: 45%; max-width: 600px; }
-        .search-input-container { display: flex; }
-        .search-box input { width: 100%; padding: 10px 15px; background: #121212; border: 1px solid #303030; color: #fff; border-radius: 0 20px 20px 0; outline: none; font-size: 14px; }
-        .search-box button { padding: 10px 20px; background: #222; border: 1px solid #303030; border-right: none; color: #fff; border-radius: 20px 0 0 20px; cursor: pointer; }
-        .search-box button:hover { background: #333; }
-        
-        .suggestions-list { position: absolute; top: 105%; left: 0; right: 0; background: #212121; border-radius: 8px; display: none; list-style: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 1px solid #383838; }
-        .suggestions-list li { padding: 10px 15px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #2a2a2a; }
-        .suggestions-list li:hover { background: #383838; }
-
-        .main-layout { display: flex; flex: 1; }
-        aside { width: 220px; padding: 15px; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid #272727; }
-        .menu-btn { background: none; border: none; color: #fff; text-align: right; padding: 12px 15px; cursor: pointer; border-radius: 10px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
-        .menu-btn:hover, .menu-btn.active { background: #272727; font-weight: bold; }
-
-        main { flex: 1; padding: 20px; }
-        
-        .player-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px; }
-        .player-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        .video-info { margin-bottom: 25px; }
-        .video-title { font-size: 18px; margin-bottom: 8px; }
-
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; margin-top: 15px; }
-        .card { background: #181818; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.2s; border: 1px solid #252525; }
-        .card:hover { transform: translateY(-4px); }
-        .card img { width: 100%; height: 130px; object-fit: cover; }
-        .card-details { padding: 10px; }
-        .card-title { font-size: 13px; font-weight: bold; line-height: 1.4; height: 36px; overflow: hidden; }
-        .card-channel { font-size: 12px; color: #aaa; margin-top: 5px; }
-        
-        .shorts-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-        .shorts-grid .card img { height: 260px; }
-
-        @media (max-width: 768px) {
-            aside { display: none; }
-            .search-box { width: 70%; }
-        }
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        input { width: 70%; padding: 10px; border-radius: 5px; border: none; font-size: 16px; }
+        button { padding: 10px 20px; border-radius: 5px; border: none; background-color: #ff0000; color: #fff; font-size: 16px; cursor: pointer; }
+        .video-container { margin-top: 20px; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
     </style>
 </head>
 <body>
-
-    <header>
-        <a href="#" class="logo">▶ <span>YouTube</span> Privacy</a>
-        <div class="search-box">
-            <div class="search-input-container">
-                <button id="searchBtn">بحث</button>
-                <input type="text" id="searchInput" placeholder="ابحث في يوتيوب..." onkeyup="handleKeyPress(event)" oninput="fetchSuggestions(this.value)">
-            </div>
-            <ul id="suggestions" class="suggestions-list"></ul>
-        </div>
-    </header>
-
-    <div class="main-layout">
-        <aside>
-            <button class="menu-btn active" onclick="loadCategory('home', this)">🏠 الصفحة الرئيسية</button>
-            <button class="menu-btn" onclick="loadCategory('shorts', this)">⚡ Shorts</button>
-        </aside>
-
-        <main>
-            <div class="player-container">
-                <iframe id="mainPlayer" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            </div>
-
-            <div class="video-info">
-                <h2 id="currentVideoTitle" class="video-title">اختر فيديو للبدء في المشاهدة</h2>
-            </div>
-
-            <h3 id="sectionTitle">مقترحات شائعة</h3>
-            <div id="videoContainer" class="video-grid"></div>
-        </main>
+    <div class="container">
+        <h2>Premuim Player</h2>
+        <input type="text" id="ytUrl" placeholder="Video link here ...">
+        <button onclick="playVideo()">Play</button>
+        <div class="video-container" id="player"></div>
     </div>
 
     <script>
-        const API_KEY = 'AIzaSyDe5exhD_PLnqgodPRN53Nse-36uw8SuQc'; 
-
-        // ربط زر البحث بالضغط
-        document.getElementById('searchBtn').addEventListener('click', triggerSearch);
-
-        // تشغيل البحث عند الضغط على Enter في لوحة المفاتيح
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                triggerSearch();
-            }
-        }
-
-        // 1. جلب اقتراحات البحث
-        function fetchSuggestions(query) {
-            const list = document.getElementById('suggestions');
-            if (!query.trim()) { list.style.display = 'none'; return; }
-
-            const script = document.createElement('script');
-            script.src = `https://suggestqueries.google.com/complete/search?client=youtube&ds=yt&q=${encodeURIComponent(query)}&jsonp=renderSuggestions`;
-            document.body.appendChild(script);
-        }
-
-        function renderSuggestions(data) {
-            const list = document.getElementById('suggestions');
-            list.innerHTML = '';
-            const results = data[1];
-
-            if (results && results.length > 0) {
-                list.style.display = 'block';
-                results.slice(0, 6).forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerText = item[0];
-                    li.onclick = () => {
-                        document.getElementById('searchInput').value = item[0];
-                        list.style.display = 'none';
-                        triggerSearch();
-                    };
-                    list.appendChild(li);
-                });
+        function playVideo() {
+            let input = document.getElementById('ytUrl').value;
+            let videoId = '';
+            
+            // استخراج ID الفيديو من الرابط
+            if (input.includes('v=')) {
+                videoId = input.split('v=')[1].split('&')[0];
+            } else if (input.includes('youtu.be/')) {
+                videoId = input.split('youtu.be/')[1].split('?')[0];
             } else {
-                list.style.display = 'none';
-            }
-        }
-
-        // 2. تشغيل الفيديو بنطاق youtube-nocookie
-        function playVideo(videoId, title) {
-            const player = document.getElementById('mainPlayer');
-            player.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
-            if (title) document.getElementById('currentVideoTitle').innerText = title;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // 3. تنفيذ عملية البحث عند ضغط الزر
-        async function triggerSearch() {
-            const query = document.getElementById('searchInput').value;
-            if (!query.trim()) return;
-
-            document.getElementById('suggestions').style.display = 'none';
-            document.getElementById('sectionTitle').innerText = `نتائج البحث عن: "${query}"`;
-            
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`;
-            
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                renderVideos(data.items);
-            } catch (err) {
-                console.error("خطأ أثناء جلب نتائج البحث:", err);
-            }
-        }
-
-        // 4. عرض شبكة الفيديوهات
-        function renderVideos(items) {
-            const grid = document.getElementById('videoContainer');
-            grid.innerHTML = '';
-
-            if(!items || items.length === 0) {
-                grid.innerHTML = '<p style="padding:10px;">لم يتم العثور على نتائج.</p>';
-                return;
+                videoId = input; // إذا دخل الـ ID مباشرة
             }
 
-            items.forEach(item => {
-                const videoId = item.id.videoId;
-                const title = item.snippet.title;
-                const thumb = item.snippet.thumbnails.medium.url;
-                const channel = item.snippet.channelTitle;
-
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => playVideo(videoId, title);
-                card.innerHTML = `
-                    <img src="${thumb}" alt="${title}">
-                    <div class="card-details">
-                        <div class="card-title">${title}</div>
-                        <div class="card-channel">${channel}</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // 5. تحميل الفيديوهات حسب الأقسام
-        async function loadCategory(type, btn) {
-            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-
-            const grid = document.getElementById('videoContainer');
-            const title = document.getElementById('sectionTitle');
-            
-            let query = type === 'shorts' ? 'shorts' : 'الجزائر تكنولوجيا';
-            
-            if (type === 'shorts') {
-                title.innerText = "فيديوهات Shorts القصيرة";
-                grid.className = "video-grid shorts-grid";
+            if (videoId) {
+                // استخدام youtube-nocookie لزيادة نسبة تخطي الحظر
+                document.getElementById('player').innerHTML = 
+                    `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
             } else {
-                title.innerText = "الصفحة الرئيسية";
-                grid.className = "video-grid";
-            }
-
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`;
-            
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                renderVideos(data.items);
-            } catch (err) {
-                console.error("خطأ في جلب البيانات:", err);
+                alert('الرابط غير صحيح!');
             }
         }
-
-        // تحميل الصفحة الأساسية
-        loadCategory('home');
-
-        // إخفاء الاقتراحات عند الضغط في مكان آخر
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-box')) {
-                document.getElementById('suggestions').style.display = 'none';
-            }
-        });
     </script>
 </body>
 </html>
