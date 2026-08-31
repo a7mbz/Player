@@ -22,6 +22,52 @@
         <div class="video-container" id="player"></div>
     </div>
 
+    <!-- Adblock YTB script -->
+    <script>
+        (function() {
+            'use strict';
+            (function() {
+    'use strict';
+
+    // Core logic to find and bypass ads
+    function bypassYouTubeAds() {
+        const video = document.querySelector('video');
+        const skipButton = document.querySelector('.ytp-skip-ad-button, .ytp-ad-skip-button, .ytp-ad-skip-button-modern');
+        const adOverlay = document.querySelector('.ytp-ad-player-overlay, .ytp-ad-overlay-container');
+
+        // 1. If an explicit "Skip" button exists, click it instantly
+        if (skipButton) {
+            skipButton.click();
+            console.log('[AdBlock] Skipped ad via button.');
+        }
+
+        // 2. If an ad is playing but unskippable, fast-forward it
+        if (adOverlay && video) {
+            // Speed up the video to 16x (maximum allowed by Chrome/Firefox engines)
+            video.playbackRate = 16;
+            video.muted = true; // Mute the ad audio
+            console.log('[AdBlock] Speeding up unskippable ad.');
+        }
+    }
+
+    // Monitor the DOM for changes so we don't rely on laggy intervals
+    const observer = new MutationObserver(() => {
+        bypassYouTubeAds();
+    });
+
+    // Start watching the YouTube player container
+    const targetNode = document.body;
+    if (targetNode) {
+        observer.observe(targetNode, {
+            childList: true,
+            subtree: true
+        });
+    }
+})();
+
+        })();
+    </script>
+    
     <script>
         function playVideo() {
             let input = document.getElementById('ytUrl').value;
