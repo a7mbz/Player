@@ -1,125 +1,644 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎃 My Toolkit 🎃</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    
-      <!-- Direct CSS implementation starts here -->
-    
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: #fff; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        input { width: 70%; padding: 10px; border-radius: 5px; border: none; font-size: 16px; }
-        button { padding: 10px 20px; border-radius: 5px; border: none; background-color: #ff0000; color: #fff; font-size: 16px; cursor: pointer; }
-        .video-container { margin-top: 20px; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-    
-      /* Reset standard margins and paddings */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎃 My Toolkit 🎃</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #15171c;
+    --surface: #1c1f26;
+    --surface-raised: #22262f;
+    --line: #33384433;
+    --line-solid: #333844;
+    --text: #ece8e1;
+    --text-dim: #9096a1;
+    --accent: #e2a33d;
+    --accent-dim: #a97a2d;
+    --accent-soft: #e2a33d22;
+    --done: #6fae7f;
+    --danger: #d16b6b;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
 
-    body {
-      font-family: Arial, sans-serif;
-    }
+  *{ margin:0; padding:0; box-sizing:border-box; }
 
-    /* Header Container */
-    .site-header {
-      display: flex;
-      justify-content: space-between; /* Pushes logo left, nav right */
-      align-items: center;            /* Centers items vertically */
-      padding: 20px 10%;              /* Adds breathing room to sides */
-      background-color: #2c3e50;      /* Dark sleek background color */
-      position: sticky;               /* Keeps navbar on top while scrolling */
-      top: 0;
-      z-index: 1000;
-    }
+  html,body{ height:100%; }
 
-    /* Logo Styling */
-    .logo a {
-      font-size: 24px;
-      font-weight: bold;
-      color: #ffffff;
-      text-decoration: none;
-    }
+  body{
+    font-family: var(--font-body);
+    background:
+      radial-gradient(circle at 15% 0%, #1e222b 0%, var(--bg) 45%),
+      var(--bg);
+    color: var(--text);
+    min-height:100vh;
+  }
 
-    /* Unordered List Layout */
-    .nav-links {
-      display: flex;
-      list-style: none;               /* Removes generic bullet points */
-    }
+  a{ color:inherit; }
 
-    /* Individual Links spacing */
-    .nav-links li {
-      padding: 0px 20px;
-    }
+  /* ---------- Top brand bar ---------- */
+  .site-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 28px;
+    background: var(--surface);
+    border-bottom:1px solid var(--line-solid);
+  }
+  .logo a{
+    font-family: var(--font-display);
+    font-size:20px;
+    font-weight:700;
+    text-decoration:none;
+    letter-spacing:0.2px;
+  }
+  .nav-links{ display:flex; list-style:none; gap:24px; }
+  .nav-links a{
+    text-decoration:none;
+    font-size:14px;
+    color: var(--text-dim);
+    transition: color .2s ease;
+  }
+  .nav-links a:hover{ color: var(--accent); }
 
-    /* Link Styling and Hover Effect */
-    .nav-links a {
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 16px;
-      transition: color 0.3s ease;
-    }
+  /* ---------- App shell ---------- */
+  .app{
+    display:grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 61px);
+  }
 
-    .nav-links a:hover {
-      color: #1abc9c;                 /* Changes color on hover */
+  /* ---------- Tool rail ---------- */
+  .rail{
+    background: var(--surface);
+    border-right:1px solid var(--line-solid);
+    padding:24px 12px;
+  }
+  .rail-label{
+    font-size:11px;
+    color: var(--text-dim);
+    padding: 4px 12px 12px;
+    letter-spacing: 0.5px;
+  }
+  .tool-switch{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    padding:11px 12px;
+    margin-bottom:6px;
+    background: transparent;
+    border:1px solid transparent;
+    border-radius:8px;
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-size:14px;
+    cursor:pointer;
+    text-align:left;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .tool-switch .dot{
+    width:7px; height:7px; border-radius:50%;
+    background: var(--line-solid);
+    flex-shrink:0;
+    transition: background .15s ease;
+  }
+  .tool-switch:hover{ background: var(--surface-raised); color: var(--text); }
+  .tool-switch.active{
+    background: var(--accent-soft);
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+  .tool-switch.active .dot{ background: var(--accent); }
+
+  /* ---------- Main panel ---------- */
+  .main{ padding:36px 40px; }
+  .panel{ display:none; max-width: 640px; }
+  .panel.active{ display:block; }
+
+  .panel-header{ margin-bottom: 22px; }
+  .panel-header h1{
+    font-family: var(--font-display);
+    font-size:24px;
+    font-weight:600;
+  }
+  .panel-header p{
+    color: var(--text-dim);
+    font-size:14px;
+    margin-top:4px;
+  }
+
+  /* instrument-panel frame used by every tool */
+  .instrument{
+    position:relative;
+    background: var(--surface);
+    border:1px solid var(--line-solid);
+    border-radius:10px;
+    padding:24px;
+  }
+  .instrument::before, .instrument::after,
+  .instrument .rivet-tl, .instrument .rivet-tr, .instrument .rivet-bl, .instrument .rivet-br{
+    content:"";
+    position:absolute;
+    width:5px; height:5px;
+    border-radius:50%;
+    background: var(--line-solid);
+  }
+  .instrument .rivet-tl{ top:8px; left:8px; }
+  .instrument .rivet-tr{ top:8px; right:8px; }
+  .instrument .rivet-bl{ bottom:8px; left:8px; }
+  .instrument .rivet-br{ bottom:8px; right:8px; }
+
+  /* ---------- shared form controls ---------- */
+  input[type="text"], input[type="number"], select, textarea{
+    width:100%;
+    padding:11px 12px;
+    border-radius:6px;
+    border:1px solid var(--line-solid);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size:14px;
+  }
+  input:focus, select:focus, textarea:focus{
+    outline: 2px solid var(--accent-dim);
+    outline-offset: 1px;
+  }
+  button{
+    padding:11px 18px;
+    border-radius:6px;
+    border:none;
+    background: var(--accent);
+    color:#20140a;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    transition: filter .15s ease;
+  }
+  button:hover{ filter: brightness(1.08); }
+  button.ghost{
+    background: transparent;
+    border:1px solid var(--line-solid);
+    color: var(--text-dim);
+    font-weight:500;
+  }
+  button.ghost:hover{ color: var(--text); border-color: var(--accent-dim); }
+
+  /* ---------- YT Player ---------- */
+  .yt-row{ display:flex; gap:10px; margin-bottom:18px; }
+  .yt-row input{ flex:1; }
+  .video-container{
+    position:relative; padding-bottom:56.25%; height:0;
+    overflow:hidden; border-radius:6px; background:#000;
+  }
+  .video-container iframe{ position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+
+  /* ---------- Calculator ---------- */
+  .calc-display{
+    background:#0e1015;
+    border:1px solid var(--line-solid);
+    border-radius:6px;
+    padding:18px 16px;
+    text-align:right;
+    font-family: var(--font-display);
+    font-size:32px;
+    margin-bottom:16px;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  .calc-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:8px;
+  }
+  .calc-grid button{
+    background: var(--surface-raised);
+    color: var(--text);
+    font-weight:500;
+    padding:16px 0;
+    font-size:16px;
+  }
+  .calc-grid button:hover{ background:#2a2f3a; filter:none; }
+  .calc-grid button.op{ color: var(--accent); }
+  .calc-grid button.equals{ background: var(--accent); color:#20140a; grid-row: span 2; }
+  .calc-grid button.zero{ grid-column: span 2; }
+  .calc-grid button.clear{ color: var(--danger); }
+
+  /* ---------- Notes ---------- */
+  #notesArea{ min-height:220px; resize:vertical; line-height:1.6; }
+  .notes-status{ font-size:12px; color: var(--text-dim); margin-top:10px; }
+
+  /* ---------- Unit Converter ---------- */
+  .conv-row{ display:flex; gap:12px; margin-bottom:14px; }
+  .conv-row > div{ flex:1; }
+  .conv-row label{ display:block; font-size:12px; color: var(--text-dim); margin-bottom:6px; }
+  .conv-values{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+  .conv-values span{ color: var(--text-dim); font-size:13px; }
+  .conv-result{
+    font-family: var(--font-display);
+    font-size:22px;
+    padding-top:6px;
+  }
+  .conv-result .unit{ font-size:14px; color: var(--text-dim); font-family: var(--font-body); }
+
+  /* ---------- Todo ---------- */
+  .todo-row{ display:flex; gap:10px; margin-bottom:16px; }
+  .todo-row input{ flex:1; }
+  .todo-list{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .todo-list li{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    background: var(--surface-raised);
+    border-radius:6px;
+    border:1px solid var(--line-solid);
+  }
+  .todo-list li.done span.txt{ text-decoration: line-through; color: var(--text-dim); }
+  .todo-list input[type="checkbox"]{
+    width:16px; height:16px; accent-color: var(--accent); flex-shrink:0;
+  }
+  .todo-list span.txt{ flex:1; font-size:14px; word-break:break-word; }
+  .todo-list button.del{
+    background:transparent; border:none; color: var(--text-dim);
+    font-size:16px; padding:2px 6px; line-height:1;
+  }
+  .todo-list button.del:hover{ color: var(--danger); }
+  .todo-empty{ color: var(--text-dim); font-size:14px; padding:12px 0; }
+
+  @media (max-width: 640px){
+    .app{ grid-template-columns: 1fr; }
+    .rail{
+      display:flex; overflow-x:auto; gap:6px;
+      border-right:none; border-bottom:1px solid var(--line-solid);
+      padding:12px;
     }
-  </style>
-  <!-- Direct CSS implementation ends here -->
+    .rail-label{ display:none; }
+    .tool-switch{ white-space:nowrap; margin-bottom:0; }
+    .main{ padding:24px 20px; }
+  }
+</style>
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="logo">
-      <a href="#">Personal Toolkit 👺</a>
-    </div>
-    <nav class="navbar">
-      <ul class="nav-links">
-        <li><a href="#Link">Home</a></li>
-        <li><a href="#Link">Soon</a></li>
-        <li><a href="#Link">Soon</a></li>
-        <li><a href="#Link">Soon</a></li>
-      </ul>
-    </nav>
-  </header>
-  
-    <br>
-    <br>
-    
-    <div class="container">
-        <h2>YT Player</h2>
-        <input type="text" id="ytUrl" placeholder="Video link here ...">
-        <button onclick="playVideo()">Play</button>
+<header class="site-header">
+  <div class="logo"><a href="#">Personal Toolkit 👺</a></div>
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Soon</a></li>
+      <li><a href="#">Soon</a></li>
+      <li><a href="#">Soon</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="app">
+  <aside class="rail">
+    <div class="rail-label">TOOLS</div>
+    <button class="tool-switch active" data-panel="yt"><span class="dot"></span>YT Player</button>
+    <button class="tool-switch" data-panel="calc"><span class="dot"></span>Calculator</button>
+    <button class="tool-switch" data-panel="notes"><span class="dot"></span>Notes</button>
+    <button class="tool-switch" data-panel="conv"><span class="dot"></span>Unit Converter</button>
+    <button class="tool-switch" data-panel="todo"><span class="dot"></span>To-Do List</button>
+  </aside>
+
+  <main class="main">
+
+    <!-- YT PLAYER -->
+    <section class="panel active" id="panel-yt">
+      <div class="panel-header">
+        <h1>YT Player</h1>
+        <p>Paste a YouTube link or video ID and play it right here.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        <div class="yt-row">
+          <input type="text" id="ytUrl" placeholder="Video link here ...">
+          <button onclick="playVideo()">Play</button>
+        </div>
         <div class="video-container" id="player"></div>
-    </div>
+      </div>
+    </section>
 
-    <script>
-        function playVideo() {
-            let input = document.getElementById('ytUrl').value;
-            let videoId = '';
-            
-            // استخراج ID الفيديو من الرابط
-            if (input.includes('v=')) {
-                videoId = input.split('v=')[1].split('&')[0];
-            } else if (input.includes('youtu.be/')) {
-                videoId = input.split('youtu.be/')[1].split('?')[0];
-            } else {
-                videoId = input; // إذا دخل الـ ID مباشرة
-            }
+    <!-- CALCULATOR -->
+    <section class="panel" id="panel-calc">
+      <div class="panel-header">
+        <h1>Calculator</h1>
+        <p>Quick arithmetic — click or type.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        <div class="calc-display" id="calcDisplay">0</div>
+        <div class="calc-grid">
+          <button class="clear" onclick="calcClear()">C</button>
+          <button class="op" onclick="calcInput('(')">(</button>
+          <button class="op" onclick="calcInput(')')">)</button>
+          <button class="op" onclick="calcInput('/')">÷</button>
 
-            if (videoId) {
-                // استخدام youtube-nocookie لزيادة نسبة تخطي الحظر
-                document.getElementById('player').innerHTML = 
-                    `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
-            } else {
-                alert('الرابط غير صحيح!');
-            }
-        }
-    </script>
+          <button onclick="calcInput('7')">7</button>
+          <button onclick="calcInput('8')">8</button>
+          <button onclick="calcInput('9')">9</button>
+          <button class="op" onclick="calcInput('*')">×</button>
+
+          <button onclick="calcInput('4')">4</button>
+          <button onclick="calcInput('5')">5</button>
+          <button onclick="calcInput('6')">6</button>
+          <button class="op" onclick="calcInput('-')">−</button>
+
+          <button onclick="calcInput('1')">1</button>
+          <button onclick="calcInput('2')">2</button>
+          <button onclick="calcInput('3')">3</button>
+          <button class="op" onclick="calcInput('+')">+</button>
+
+          <button class="zero" onclick="calcInput('0')">0</button>
+          <button onclick="calcInput('.')">.</button>
+          <button class="equals" onclick="calcEquals()">=</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section class="panel" id="panel-notes">
+      <div class="panel-header">
+        <h1>Notes</h1>
+        <p>Saved automatically in this browser as you type.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        <textarea id="notesArea" placeholder="Write anything..."></textarea>
+        <div class="notes-status" id="notesStatus">All changes saved</div>
+      </div>
+    </section>
+
+    <!-- UNIT CONVERTER -->
+    <section class="panel" id="panel-conv">
+      <div class="panel-header">
+        <h1>Unit Converter</h1>
+        <p>Length, weight, and temperature conversions.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+
+        <div class="conv-row">
+          <div>
+            <label for="convCategory">Category</label>
+            <select id="convCategory" onchange="convCategoryChanged()">
+              <option value="length">Length</option>
+              <option value="weight">Weight</option>
+              <option value="temperature">Temperature</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="conv-row">
+          <div>
+            <label for="convFrom">From</label>
+            <select id="convFrom" onchange="convertUnits()"></select>
+          </div>
+          <div>
+            <label for="convTo">To</label>
+            <select id="convTo" onchange="convertUnits()"></select>
+          </div>
+        </div>
+
+        <div class="conv-values">
+          <input type="number" id="convInput" value="1" oninput="convertUnits()">
+        </div>
+
+        <div class="conv-result" id="convResult">—</div>
+      </div>
+    </section>
+
+    <!-- TODO -->
+    <section class="panel" id="panel-todo">
+      <div class="panel-header">
+        <h1>To-Do List</h1>
+        <p>Saved automatically in this browser.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        <div class="todo-row">
+          <input type="text" id="todoInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter') addTodo()">
+          <button onclick="addTodo()">Add</button>
+        </div>
+        <ul class="todo-list" id="todoList"></ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- Tool switching ---------------- */
+document.querySelectorAll('.tool-switch').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tool-switch').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  });
+});
+
+/* ---------------- YT Player ---------------- */
+function playVideo() {
+  let input = document.getElementById('ytUrl').value.trim();
+  let videoId = '';
+
+  if (input.includes('v=')) {
+    videoId = input.split('v=')[1].split('&')[0];
+  } else if (input.includes('youtu.be/')) {
+    videoId = input.split('youtu.be/')[1].split('?')[0];
+  } else {
+    videoId = input;
+  }
+
+  if (videoId) {
+    document.getElementById('player').innerHTML =
+      `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
+  } else {
+    alert('That link doesn\'t look right — try pasting the full YouTube URL.');
+  }
+}
+
+/* ---------------- Calculator ---------------- */
+let calcExpr = '';
+const calcDisplay = document.getElementById('calcDisplay');
+
+function calcInput(val) {
+  calcExpr += val;
+  calcDisplay.textContent = calcExpr;
+}
+function calcClear() {
+  calcExpr = '';
+  calcDisplay.textContent = '0';
+}
+function calcEquals() {
+  if (!calcExpr) return;
+  try {
+    if (!/^[0-9+\-*/(). ]+$/.test(calcExpr)) throw new Error('invalid');
+    const result = Function('"use strict"; return (' + calcExpr + ')')();
+    calcDisplay.textContent = result;
+    calcExpr = String(result);
+  } catch (e) {
+    calcDisplay.textContent = 'Error';
+    calcExpr = '';
+  }
+}
+
+/* ---------------- Notes ---------------- */
+const notesArea = document.getElementById('notesArea');
+const notesStatus = document.getElementById('notesStatus');
+notesArea.value = localStorage.getItem('toolkit_notes') || '';
+let notesTimer;
+notesArea.addEventListener('input', () => {
+  notesStatus.textContent = 'Saving...';
+  clearTimeout(notesTimer);
+  notesTimer = setTimeout(() => {
+    localStorage.setItem('toolkit_notes', notesArea.value);
+    notesStatus.textContent = 'All changes saved';
+  }, 400);
+});
+
+/* ---------------- Unit Converter ---------------- */
+const convUnits = {
+  length: {
+    base: 'meters',
+    units: {
+      meters: 1,
+      kilometers: 1000,
+      centimeters: 0.01,
+      miles: 1609.344,
+      feet: 0.3048,
+      inches: 0.0254
+    }
+  },
+  weight: {
+    base: 'grams',
+    units: {
+      grams: 1,
+      kilograms: 1000,
+      pounds: 453.59237,
+      ounces: 28.349523125
+    }
+  },
+  temperature: {
+    base: 'celsius',
+    units: { celsius: 1, fahrenheit: 1, kelvin: 1 } // handled specially
+  }
+};
+
+const convCategory = document.getElementById('convCategory');
+const convFrom = document.getElementById('convFrom');
+const convTo = document.getElementById('convTo');
+const convInput = document.getElementById('convInput');
+const convResult = document.getElementById('convResult');
+
+function populateUnitSelects() {
+  const cat = convCategory.value;
+  const unitNames = Object.keys(convUnits[cat].units);
+  convFrom.innerHTML = unitNames.map(u => `<option value="${u}">${capitalize(u)}</option>`).join('');
+  convTo.innerHTML = unitNames.map(u => `<option value="${u}">${capitalize(u)}</option>`).join('');
+  convTo.selectedIndex = unitNames.length > 1 ? 1 : 0;
+}
+function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function convCategoryChanged() {
+  populateUnitSelects();
+  convertUnits();
+}
+
+function tempToCelsius(value, unit) {
+  if (unit === 'celsius') return value;
+  if (unit === 'fahrenheit') return (value - 32) * 5/9;
+  if (unit === 'kelvin') return value - 273.15;
+}
+function celsiusToTemp(value, unit) {
+  if (unit === 'celsius') return value;
+  if (unit === 'fahrenheit') return (value * 9/5) + 32;
+  if (unit === 'kelvin') return value + 273.15;
+}
+
+function convertUnits() {
+  const cat = convCategory.value;
+  const from = convFrom.value;
+  const to = convTo.value;
+  const value = parseFloat(convInput.value);
+
+  if (isNaN(value)) {
+    convResult.innerHTML = '—';
+    return;
+  }
+
+  let result;
+  if (cat === 'temperature') {
+    const celsius = tempToCelsius(value, from);
+    result = celsiusToTemp(celsius, to);
+  } else {
+    const units = convUnits[cat].units;
+    const base = value * units[from];
+    result = base / units[to];
+  }
+
+  const rounded = Math.round(result * 10000) / 10000;
+  convResult.innerHTML = `${rounded} <span class="unit">${capitalize(to)}</span>`;
+}
+
+populateUnitSelects();
+convertUnits();
+
+/* ---------------- To-Do List ---------------- */
+const todoInput = document.getElementById('todoInput');
+const todoListEl = document.getElementById('todoList');
+let todos = JSON.parse(localStorage.getItem('toolkit_todos') || '[]');
+
+function saveTodos() {
+  localStorage.setItem('toolkit_todos', JSON.stringify(todos));
+}
+
+function renderTodos() {
+  if (todos.length === 0) {
+    todoListEl.innerHTML = '<li class="todo-empty" style="list-style:none;">Nothing here yet — add your first task above.</li>';
+    return;
+  }
+  todoListEl.innerHTML = todos.map((t, i) => `
+    <li class="${t.done ? 'done' : ''}">
+      <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${i})">
+      <span class="txt">${escapeHtml(t.text)}</span>
+      <button class="del" onclick="deleteTodo(${i})">✕</button>
+    </li>
+  `).join('');
+}
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+function addTodo() {
+  const val = todoInput.value.trim();
+  if (!val) return;
+  todos.push({ text: val, done: false });
+  todoInput.value = '';
+  saveTodos();
+  renderTodos();
+}
+function toggleTodo(i) {
+  todos[i].done = !todos[i].done;
+  saveTodos();
+  renderTodos();
+}
+function deleteTodo(i) {
+  todos.splice(i, 1);
+  saveTodos();
+  renderTodos();
+}
+renderTodos();
+</script>
 </body>
 </html>
