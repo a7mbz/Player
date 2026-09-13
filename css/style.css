@@ -145,7 +145,7 @@ a {
 .panel {
   display: none;
   max-width: 70%; /* Allows every tool to naturally stretch across the entire main screen */
-  width: 100%;
+  width: 70%;
 }
 
 .panel.active {
