@@ -144,7 +144,7 @@ a {
 /* Update this block inside your style.css file */
 .panel {
   display: none;
-  max-width: 100%; /* Allows every tool to naturally stretch across the entire main screen */
+  max-width: 70%; /* Allows every tool to naturally stretch across the entire main screen */
   width: 100%;
 }
 
