@@ -141,11 +141,9 @@ a {
   padding: 36px 40px;
 }
 
-/* Update this block inside your style.css file */
 .panel {
   display: none;
-  max-width: 70%; /* Allows every tool to naturally stretch across the entire main screen */
-  width: 70%;
+  max-width: 640px; /* This resets it back to your original tight, centered layout */
 }
 
 .panel.active {
