@@ -25,11 +25,11 @@
 </header>
 
 <div class="app">
-  <!-- SIDEBAR NAVIGATION -->
-  <aside class="rail">
+  <!-- SIDEBAR NAVIGATION (WITH TOGGLE BUTTON) -->
+  <aside class="rail" id="appRail">
+    <button class="rail-toggle-btn" id="railToggleBtn" title="Toggle Sidebar">❮</button>
     <div class="rail-label">TOOLS</div>
-    <button class="tool-switch active" data-panel="yt"><span class="dot"></span>YT Player</button>
-    <button class="tool-switch" data-panel="yt-search"><span class="dot"></span>YT Search</button>
+    <button class="tool-switch active" data-panel="yt-search"><span class="dot"></span>YT Search</button>
     <button class="tool-switch" data-panel="calc"><span class="dot"></span>Calculator</button>
     <button class="tool-switch" data-panel="notes"><span class="dot"></span>Notes</button>
     <button class="tool-switch" data-panel="solitaire"><span class="dot"></span>Solitaire</button>
@@ -39,31 +39,18 @@
   <!-- MAIN PANELS -->
   <main class="main">
     
-    <!-- 1. YT PLAYER -->
-    <section class="panel active" id="panel-yt">
+    <!-- 1. YT SEARCH & BIG PLAYER PANEL -->
+    <section class="panel active" id="panel-yt-search">
       <div class="panel-header">
-        <h1>YT Player</h1>
-        <p>Paste a YouTube link or video ID and play it right here.</p>
-      </div>
-      <div class="instrument">
-        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
-        <div class="yt-row">
-          <input type="text" id="ytUrl" placeholder="Video link or ID here ...">
-          <button type="button" id="playBtn">Play</button>
-        </div>
-        <div class="video-container" id="player"></div>
-      </div>
-    </section>
-    
-    <!-- 2. YT SEARCH PANEL -->
-    <section class="panel" id="panel-yt-search">
-      <div class="panel-header">
-        <h1>YT Search</h1>
-        <p>Search tracks or videos instantly using the Live YouTube API (Privacy Enhanced).</p>
+        <h1>YT Search & Cinema Player</h1>
+        <p>Search tracks or videos instantly and play in high-definition widescreen.</p>
       </div>
       <div class="instrument">
         <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
         
+        <!-- Big Widescreen Player Container -->
+        <div id="custom-yt-main-player" class="video-container" style="display: none; margin-bottom: 24px; border: 1px solid var(--accent-dim); box-shadow: 0 8px 24px rgba(0,0,0,0.5);"></div>
+
         <div class="movie-controls" style="margin-bottom: 24px;">
           <input type="text" id="custom-yt-query" placeholder="Type video names, music titles, or artists...">
           <button type="button" id="search-yt-btn">Search</button>
@@ -71,11 +58,11 @@
 
         <div id="custom-yt-status" style="text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 16px; min-height: 1.2em;"></div>
 
-        <div id="custom-yt-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; width: 100%;"></div>
+        <div id="custom-yt-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; width: 100%;"></div>
       </div>
     </section>  
     
-    <!-- 3. CALCULATOR -->
+    <!-- 2. CALCULATOR -->
     <section class="panel" id="panel-calc">
       <div class="panel-header">
         <h1>Calculator</h1>
@@ -112,7 +99,7 @@
       </div>
     </section>
 
-    <!-- 4. NOTES -->
+    <!-- 3. NOTES -->
     <section class="panel" id="panel-notes">
       <div class="panel-header">
         <h1>Notes</h1>
@@ -125,7 +112,7 @@
       </div>
     </section>
     
-    <!-- 5. SPIDER SOLITAIRE PANEL -->
+    <!-- 4. SPIDER SOLITAIRE PANEL -->
     <section class="panel" id="panel-solitaire">
       <div class="panel-header">
         <h1>Spider Solitaire</h1>
@@ -143,7 +130,7 @@
       </div>
     </section>
 
-    <!-- 6. MOVIES PLAYER -->
+    <!-- 5. MOVIES PLAYER -->
     <section class="panel" id="panel-movies">
       <div class="panel-header">
         <h1>Movies & Shows Player</h1>
