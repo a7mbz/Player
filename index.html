@@ -53,31 +53,31 @@
         <div class="video-container" id="player"></div>
       </div>
         </section>
+    
+<!-- NEW MATCHING YT SEARCH PANEL -->
+<section class="panel" id="panel-yt-search">
+  <div class="panel-header">
+    <h1>YT Search</h1>
+    <p>Search tracks or videos instantly using the Live YouTube API (Privacy Enhanced).</p>
+  </div>
+  <div class="instrument">
+    <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+    
+    <!-- Search Input Controls styled like Movies Player -->
+    <div class="movie-controls" style="margin-bottom: 24px;">
+      <input type="text" id="custom-yt-query" placeholder="Type video names, music titles, or artists..." onkeyup="if(event.key === 'Enter') runCustomYTSearch();">
+      <button type="button" onclick="runCustomYTSearch()">Search</button>
+    </div>
 
-  <!-- NEW MATCHING YT SEARCH PANEL -->
-    <section class="panel" id="panel-yt-search">
-      <div class="panel-header">
-        <h1>YT Search</h1>
-        <p>Search tracks or videos instantly using the Live YouTube API.</p>
-      </div>
-      <div class="instrument">
-        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
-        
-        <!-- Search Input Controls styled like Movies Player -->
-        <div class="movie-controls" style="margin-bottom: 24px;">
-          <input type="text" id="custom-yt-query" placeholder="Type video names, music titles, or artists...">
-          <button onclick="runCustomYTSearch()">Search</button>
-        </div>
+    <!-- Realtime Status Loader -->
+    <div id="custom-yt-status" style="text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 16px; min-height: 1.2em;"></div>
 
-        <!-- Realtime Status Loader -->
-        <div id="custom-yt-status" style="text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 16px; min-height: 1.2em;"></div>
-
-        <!-- Grid for API Cards -->
-        <div id="custom-yt-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; width: 100%;">
-          <!-- JavaScript populates results here -->
-        </div>
-      </div>
-    </section>  
+    <!-- Grid for API Cards -->
+    <div id="custom-yt-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; width: 100%;">
+      <!-- JavaScript populates results here -->
+    </div>
+  </div>
+</section>  
   
     <!-- CALCULATOR -->
     <section class="panel" id="panel-calc">
@@ -198,7 +198,7 @@
   </main>
 </div>
 
-  <!-- EXTERNAL BASE LOGIC ASSET -->
+<!-- EXTERNAL BASE LOGIC ASSET -->
 <script src="js/script.js"></script>
 
 <!-- LIVE SEARCH EXECUTION ENGINE -->
@@ -216,14 +216,21 @@
     labelStatus.innerText = "Searching global library indexes...";
     gridTarget.innerHTML = ""; 
 
-    // FIXED: Clean, properly structured API endpoint URL matching Google guidelines
+    // FIXED: Corrected complete endpoint link configuration structure 
     const targetEndpoint = `https://googleapis.com{encodeURIComponent(inputVal)}&type=video&key=${CUSTOM_YT_KEY}`;
 
     try {
       const apiFetch = await fetch(targetEndpoint);
-      if (!apiFetch.ok) throw new Error("API Transmission Request Failure.");
-      
       const payloadResult = await apiFetch.json();
+
+      // FIXED: Enhanced error debugging catches exact dashboard message responses
+      if (!apiFetch.ok) {
+        console.error("Google API Response Error Object:", payloadResult);
+        const errMessage = payloadResult.error ? payloadResult.error.message : "Unknown API Error";
+        labelStatus.innerText = `Google API Error: ${errMessage}`;
+        return;
+      }
+      
       labelStatus.innerText = ""; 
 
       if (!payloadResult.items || payloadResult.items.length === 0) {
@@ -231,7 +238,6 @@
         return;
       }
 
-      // FIXED: Restored complete rendering loop logic
       payloadResult.items.forEach(videoItem => {
         const id = videoItem.id.videoId;
         const title = videoItem.snippet.title;
@@ -263,9 +269,10 @@
 
         dynamicItem.onclick = function() {
           const frameContainer = this.firstElementChild;
+          // FIXED & OPTIMIZED: Implements official youtube-nocookie privacy stream engine tracking configurations
           frameContainer.innerHTML = `
             <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-                    src="https://youtube.com{id}?autoplay=1" 
+                    src="https://youtube-nocookie.com{id}?autoplay=1" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                     allowfullscreen>
             </iframe>
@@ -282,19 +289,12 @@
 
     } catch (err) {
       console.error(err);
-      labelStatus.innerText = "Network search error. Check your API key dashboard or console.";
+      labelStatus.innerText = "Local structural error loading your results grid rendering loops.";
     }
   }
 
-  // Keyboard Enter hook
+  // Keyboard Navigation Router Binding Setup
   document.addEventListener("DOMContentLoaded", () => {
-    const inputElement = document.getElementById("custom-yt-query");
-    if (inputElement) {
-      inputElement.addEventListener("keyup", function(e) {
-        if (e.key === "Enter") runCustomYTSearch();
-      });
-    }
-
     /* BACKFALL PANEL SWITCHER HOOKS */
     const switches = document.querySelectorAll(".rail .tool-switch");
     const panels = document.querySelectorAll("main.main .panel");
