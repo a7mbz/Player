@@ -199,7 +199,7 @@
 </div>
 
 
-  <!-- LIVE SEARCH EXECUTION ENGINE -->
+<!-- LIVE SEARCH EXECUTION ENGINE -->
 <script>
   // 🔑 YOUR GOOGLE YOUTUBE V3 API KEY
   const CUSTOM_YT_KEY = "AIzaSyCgEU5RK5bwqoDrV5QRORXc-E_2M2HjKNY"; 
@@ -214,16 +214,17 @@
     labelStatus.innerText = "Searching global library indexes...";
     gridTarget.innerHTML = ""; 
 
-    // FIXED: Added 'www.' to satisfy cross-origin requirements safely
+    // Explicit direct URL endpoint parameter configuration string
     const targetEndpoint = `https://googleapis.com{encodeURIComponent(inputVal)}&type=video&key=${CUSTOM_YT_KEY}`;
 
     try {
       const apiFetch = await fetch(targetEndpoint);
       const payloadResult = await apiFetch.json();
 
+      // Catch structural errors returned directly by Google's API server
       if (!apiFetch.ok) {
-        console.error("Google API Response Error Object:", payloadResult);
-        const errMessage = payloadResult.error ? payloadResult.error.message : "Unknown API Error";
+        console.error("Google API Failure Object:", payloadResult);
+        const errMessage = payloadResult.error ? payloadResult.error.message : "Unknown Connection Failure";
         labelStatus.innerText = `Google API Error: ${errMessage}`;
         return;
       }
@@ -245,14 +246,8 @@
         const channelName = videoItem.snippet.channelTitle || "Unknown Channel";
         
         let thumbUrl = "https://unsplash.com"; 
-        if (videoItem.snippet.thumbnails) {
-          if (videoItem.snippet.thumbnails.high) {
-            thumbUrl = videoItem.snippet.thumbnails.high.url;
-          } else if (videoItem.snippet.thumbnails.medium) {
-            thumbUrl = videoItem.snippet.thumbnails.medium.url;
-          } else if (videoItem.snippet.thumbnails.default) {
-            thumbUrl = videoItem.snippet.thumbnails.default.url;
-          }
+        if (videoItem.snippet.thumbnails && videoItem.snippet.thumbnails.high) {
+          thumbUrl = videoItem.snippet.thumbnails.high.url;
         }
 
         const dynamicItem = document.createElement("div");
@@ -280,7 +275,7 @@
 
         dynamicItem.onclick = function() {
           const frameContainer = this.firstElementChild;
-          // FIXED: Swapped static {id} out for literal variable template strings
+          // Privacy protection domain without cookies
           frameContainer.innerHTML = `
             <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
                     src="https://youtube-nocookie.com{id}?autoplay=1" 
@@ -299,14 +294,13 @@
       });
 
     } catch (err) {
-      console.error("Caught Local Exception:", err);
-      labelStatus.innerText = `Internal Processing Error: ${err.message}`;
+      console.error(err);
+      labelStatus.innerText = `Network Connection Blocked: ${err.message}`;
     }
   }
 
-  // Keyboard Navigation Router Binding Setup
+  // Navigation Panel Integration Sidebar Script Hooks
   document.addEventListener("DOMContentLoaded", () => {
-    /* BACKFALL PANEL SWITCHER HOOKS */
     const switches = document.querySelectorAll(".rail .tool-switch");
     const panels = document.querySelectorAll("main.main .panel");
 
@@ -325,7 +319,6 @@
     });
   });
 </script>
-
 
 
   
