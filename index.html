@@ -198,9 +198,6 @@
   </main>
 </div>
 
-<!-- EXTERNAL BASE LOGIC ASSET -->
-<script src="js/script.js"></script>
-
 <!-- LIVE SEARCH EXECUTION ENGINE -->
 <script>
   // 🔑 YOUR GOOGLE YOUTUBE V3 API KEY
@@ -216,14 +213,12 @@
     labelStatus.innerText = "Searching global library indexes...";
     gridTarget.innerHTML = ""; 
 
-    // FIXED: Corrected complete endpoint link configuration structure 
     const targetEndpoint = `https://googleapis.com{encodeURIComponent(inputVal)}&type=video&key=${CUSTOM_YT_KEY}`;
 
     try {
       const apiFetch = await fetch(targetEndpoint);
       const payloadResult = await apiFetch.json();
 
-      // FIXED: Enhanced error debugging catches exact dashboard message responses
       if (!apiFetch.ok) {
         console.error("Google API Response Error Object:", payloadResult);
         const errMessage = payloadResult.error ? payloadResult.error.message : "Unknown API Error";
@@ -239,10 +234,26 @@
       }
 
       payloadResult.items.forEach(videoItem => {
+        // FAIL-SAFE 1: Verify the item has an ID and a snippet object
+        if (!videoItem.id || !videoItem.snippet) return;
+        
         const id = videoItem.id.videoId;
-        const title = videoItem.snippet.title;
-        const channelName = videoItem.snippet.channelTitle;
-        const thumbUrl = videoItem.snippet.thumbnails.high.url; 
+        if (!id) return; // Skip items that aren't actual videos (channels/playlists)
+
+        const title = videoItem.snippet.title || "No Title";
+        const channelName = videoItem.snippet.channelTitle || "Unknown Channel";
+        
+        // FAIL-SAFE 2: Safe fallback chain for missing image thumbnails
+        let thumbUrl = "https://unsplash.com"; // Default template backdrop
+        if (videoItem.snippet.thumbnails) {
+          if (videoItem.snippet.thumbnails.high) {
+            thumbUrl = videoItem.snippet.thumbnails.high.url;
+          } else if (videoItem.snippet.thumbnails.medium) {
+            thumbUrl = videoItem.snippet.thumbnails.medium.url;
+          } else if (videoItem.snippet.thumbnails.default) {
+            thumbUrl = videoItem.snippet.thumbnails.default.url;
+          }
+        }
 
         const dynamicItem = document.createElement("div");
         dynamicItem.style.cssText = "background: #161616; border: 1px solid #222; border-radius: 6px; overflow: hidden; cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;";
@@ -269,7 +280,6 @@
 
         dynamicItem.onclick = function() {
           const frameContainer = this.firstElementChild;
-          // FIXED & OPTIMIZED: Implements official youtube-nocookie privacy stream engine tracking configurations
           frameContainer.innerHTML = `
             <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
                     src="https://youtube-nocookie.com{id}?autoplay=1" 
@@ -288,8 +298,8 @@
       });
 
     } catch (err) {
-      console.error(err);
-      labelStatus.innerText = "Local structural error loading your results grid rendering loops.";
+      console.error("Caught Local Exception:", err);
+      labelStatus.innerText = `Internal Processing Error: ${err.message}`;
     }
   }
 
