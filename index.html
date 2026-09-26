@@ -1,122 +1,179 @@
-<!-- LIVE SEARCH EXECUTION ENGINE -->
-<script>
-  // 🔑 YOUR GOOGLE YOUTUBE V3 API KEY
-  const CUSTOM_YT_KEY = "AIzaSyCgEU5RK5bwqoDrV5QRORXc-E_2M2HjKNY"; 
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎃My Toolkit🎃</title>
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-  async function runCustomYTSearch() {
-    const inputVal = document.getElementById("custom-yt-query").value.trim();
-    const gridTarget = document.getElementById("custom-yt-results");
-    const labelStatus = document.getElementById("custom-yt-status");
+<header class="site-header">
+  <div class="logo"><a href="#">Personal Toolkit 👺</a></div>
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Soon</a></li>
+      <li><a href="#">Soon</a></li>
+      <li><a href="#">Soon</a></li>
+    </ul>
+  </nav>
+</header>
 
-    if (!inputVal) return;
+<div class="app">
+  <aside class="rail">
+    <div class="rail-label">TOOLS</div>
+    <button class="tool-switch active" data-panel="yt"><span class="dot"></span>YT Player</button>
+    <button class="tool-switch" data-panel="yt-search"><span class="dot"></span>YT Search</button>
+    <button class="tool-switch" data-panel="calc"><span class="dot"></span>Calculator</button>
+    <button class="tool-switch" data-panel="notes"><span class="dot"></span>Notes</button>
+    <button class="tool-switch" data-panel="solitaire"><span class="dot"></span>Solitaire</button>
+    <button class="tool-switch" data-panel="movies"><span class="dot"></span>Movies Player</button>
+  </aside>
 
-    labelStatus.innerText = "Searching global library indexes...";
-    gridTarget.innerHTML = ""; 
+  <main class="main">
+    
+    <!-- YT PLAYER -->
+    <section class="panel active" id="panel-yt">
+      <div class="panel-header">
+        <h1>YT Player</h1>
+        <p>Paste a YouTube link or video ID and play it right here.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        <div class="yt-row">
+          <input type="text" id="ytUrl" placeholder="Video link here ...">
+          <button id="playBtn">Play</button>
+        </div>
+        <div class="video-container" id="player"></div>
+      </div>
+        </section>
 
-    // ✅ تصحيح رابط الـ API وإضافة المعاملات المطلوبة (part, maxResults, q, type, key)
-    const targetEndpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(inputVal)}&type=video&key=${CUSTOM_YT_KEY}`;
+  
+    <!-- CALCULATOR -->
+    <section class="panel" id="panel-calc">
+      <div class="panel-header">
+        <h1>Calculator</h1>
+        <p>Quick arithmetic — click or type.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        <div class="calc-display" id="calcDisplay">0</div>
+        <div class="calc-grid">
+          <button class="clear" data-calc-action="clear">C</button>
+          <button class="op" data-calc-input="(">(</button>
+          <button class="op" data-calc-input=")">)</button>
+          <button class="op" data-calc-input="/">÷</button>
 
-    try {
-      const apiFetch = await fetch(targetEndpoint);
-      const payloadResult = await apiFetch.json();
+          <button data-calc-input="7">7</button>
+          <button data-calc-input="8">8</button>
+          <button data-calc-input="9">9</button>
+          <button class="op" data-calc-input="*">×</button>
 
-      // Catch structural errors returned directly by Google's API server
-      if (!apiFetch.ok) {
-        console.error("Google API Failure Object:", payloadResult);
-        const errMessage = payloadResult.error ? payloadResult.error.message : "Unknown Connection Failure";
-        labelStatus.innerText = `Google API Error: ${errMessage}`;
-        return;
-      }
-      
-      labelStatus.innerText = ""; 
+          <button data-calc-input="4">4</button>
+          <button data-calc-input="5">5</button>
+          <button data-calc-input="6">6</button>
+          <button class="op" data-calc-input="-">−</button>
 
-      if (!payloadResult.items || payloadResult.items.length === 0) {
-        labelStatus.innerText = "No video matches found.";
-        return;
-      }
+          <button data-calc-input="1">1</button>
+          <button data-calc-input="2">2</button>
+          <button data-calc-input="3">3</button>
+          <button class="op" data-calc-input="+">+</button>
 
-      payloadResult.items.forEach(videoItem => {
-        if (!videoItem.id || !videoItem.snippet) return;
+          <button class="zero" data-calc-input="0">0</button>
+          <button data-calc-input=".">.</button>
+          <button class="equals" data-calc-action="equals">=</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section class="panel" id="panel-notes">
+      <div class="panel-header">
+        <h1>Notes</h1>
+        <p>Saved automatically in this browser as you type.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        <textarea id="notesArea" placeholder="Write anything..."></textarea>
+        <div class="notes-status" id="notesStatus">All changes saved</div>
+      </div>
+    </section>
+    
+<!-- SPIDER SOLITAIRE TAB PANEL -->
+<section class="panel" id="panel-solitaire">
+  <div class="panel-header">
+    <h1>Spider Solitaire</h1>
+    <p>Play an unblocked round of classic Spider Solitaire.</p>
+  </div>
+  <div class="instrument" style="display: flex; justify-content: center; align-items: center; min-height: 250px;">
+    <!-- Corner rivets to match your theme's design style -->
+    <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+    
+    <!-- Action Tab Button -->
+    <a href="https://htmlpreview.github.io/?https://github.com/lrusso/Spider/blob/master/Spider.htm" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       style="display: inline-flex; align-items: center; justify-content: center; background-color: #0b6623; color: white; text-decoration: none; font-size: 1.1rem; font-weight: bold; padding: 16px 32px; border: 2px solid #053b14; border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; font-family: inherit;">
+       <span style="margin-right: 10px; font-size: 1.4rem; line-height: 1;">♠</span> 
+       Launch Game in New Tab
+    </a>
+  </div>
+</section>
+
+      <!-- MOVIES PLAYER (SEARCH BY NAME) -->
+    <section class="panel" id="panel-movies">
+      <div class="panel-header">
+        <h1>Movies & Shows Player</h1>
+        <p>Search any movie or TV series by name and watch instantly.</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
         
-        const id = videoItem.id.videoId;
-        if (!id) return; 
+        <!-- شريط البحث بالاسم -->
+        <div class="movie-controls">
+          <input type="text" id="movieSearchInput" placeholder="Search movie or TV show name (e.g. Silo, Batman)...">
+          <select id="movieTypeSelect">
+            <option value="movie">Movie</option>
+            <option value="tv">TV Series</option>
+          </select>
+          <button id="searchMovieBtn">Search</button>
+        </div>
 
-        const title = videoItem.snippet.title || "No Title";
-        const channelName = videoItem.snippet.channelTitle || "Unknown Channel";
-        
-        let thumbUrl = "https://via.placeholder.com/320x180?text=No+Thumbnail"; 
-        if (videoItem.snippet.thumbnails && videoItem.snippet.thumbnails.high) {
-          thumbUrl = videoItem.snippet.thumbnails.high.url;
-        }
+        <!-- نتائج البحث بالصور -->
+        <div id="searchResults" class="search-results-grid"></div>
 
-        const dynamicItem = document.createElement("div");
-        dynamicItem.style.cssText = "background: #161616; border: 1px solid #222; border-radius: 6px; overflow: hidden; cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;";
-        
-        dynamicItem.onmouseenter = () => { dynamicItem.style.borderColor = '#3a3a3a'; dynamicItem.style.transform = 'translateY(-2px)'; };
-        dynamicItem.onmouseleave = () => { dynamicItem.style.borderColor = '#222'; dynamicItem.style.transform = 'translateY(0)'; };
+        <!-- أزرار الموسم والحلقة للمسلسلات -->
+        <div class="tv-controls" id="tvControls" style="display: none;">
+          <input type="number" id="tvSeasonInput" placeholder="Season" value="1" min="1">
+          <input type="number" id="tvEpisodeInput" placeholder="Episode" value="1" min="1">
+          <button id="updateTvBtn">Update Episode</button>
+        </div>
 
-        dynamicItem.innerHTML = `
-          <div style="position: relative; padding-bottom: 56.25%; background: #000; overflow: hidden;">
-            <img src="${thumbUrl}" alt="Preview" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; object-fit: cover; opacity: 0.85;">
-            <div class="play-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); opacity:0; transition: opacity 0.2s;">
-               <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            </div>
-          </div>
-          <div style="padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-            <div style="font-size: 0.85rem; font-weight: 600; color: #eaeaea; line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 4px;">
-              ${title}
-            </div>
-            <div style="font-size: 0.75rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-              ${channelName}
-            </div>
-          </div>
-        `;
+        <!-- أزرار السيرفرات -->
+        <div class="movie-servers">
+          <span class="server-label">Servers:</span>
+          <button class="server-btn active" data-server="vidsrc">VidSrc</button>
+          <button class="server-btn" data-server="autoembed">AutoEmbed</button>
+          <button class="server-btn" data-server="embed2">2Embed</button>
+        </div>
 
-        dynamicItem.onclick = function() {
-          const frameContainer = this.firstElementChild;
-          
-          // ✅ تصحيح مسار الـ Iframe وشكل الـ Embed الخاص بـ youtube-nocookie
-          frameContainer.innerHTML = `
-            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-                    src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
-          `;
-          dynamicItem.onclick = null; 
-        };
+        <!-- المشغل -->
+        <div class="video-container" id="moviePlayerContainer">
+          <iframe id="movieIframe" src="https://vidsrc.to/embed/movie/550" allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>
 
-        const overlay = dynamicItem.querySelector('.play-overlay');
-        dynamicItem.addEventListener('mouseenter', () => overlay.style.opacity = '1');
-        dynamicItem.addEventListener('mouseleave', () => overlay.style.opacity = '0');
 
-        gridTarget.appendChild(dynamicItem);
-      });
+  </main>
+</div>
 
-    } catch (err) {
-      console.error(err);
-      labelStatus.innerText = `Network Connection Blocked: ${err.message}`;
-    }
-  }
-
-  // ✅ إصلاح وتنظيم سكريبت التنقل الجانبي ليعمل مع جميع التبويبات (YT, Calc, Notes, Solitaire, Movies)
-  document.addEventListener("DOMContentLoaded", () => {
-    const switches = document.querySelectorAll(".rail .tool-switch");
-    const panels = document.querySelectorAll("main.main .panel");
-
-    switches.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const targetAttr = btn.getAttribute("data-panel");
-        
-        switches.forEach(s => s.classList.remove("active"));
-        panels.forEach(p => p.classList.remove("active"));
-        
-        btn.classList.add("active");
-        const targetPanel = document.getElementById(`panel-${targetAttr}`);
-        if (targetPanel) {
-          targetPanel.classList.add("active");
-        }
-      });
-    });
-  });
-</script>
+  
+</body>
+</html>
