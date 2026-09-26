@@ -1,5 +1,5 @@
 // 🔑 YOUR GOOGLE YOUTUBE V3 API KEY
-const CUSTOM_YT_KEY = "AIzaSyCgEU5RK5bwqoDrV5QRORXc-E_2M2HjKNY";
+const CUSTOM_YT_KEY = "AIzaSyD4won1S7jxZsKaw4f29vo8he-fizrV2kw";
 
 // 1. Sidebar Tab Switcher
 function initTabs() {
