@@ -1,7 +1,19 @@
 // 🔑 YOUR GOOGLE YOUTUBE V3 API KEY
 const CUSTOM_YT_KEY = "AIzaSyD4won1S7jxZsKaw4f29vo8he-fizrV2kw";
 
-// 1. Sidebar Tab Switcher
+// 1. Sidebar Collapse / Expand Functionality
+function initSidebarToggle() {
+  const rail = document.getElementById("appRail");
+  const toggleBtn = document.getElementById("railToggleBtn");
+
+  if (!rail || !toggleBtn) return;
+
+  toggleBtn.addEventListener("click", () => {
+    rail.classList.toggle("collapsed");
+  });
+}
+
+// 2. Sidebar Tab Switcher
 function initTabs() {
   const switches = document.querySelectorAll(".rail .tool-switch");
   const panels = document.querySelectorAll("main.main .panel");
@@ -22,7 +34,7 @@ function initTabs() {
   });
 }
 
-// 2. YT Search Engine (YouTube Data API v3)
+// 3. YT Search & Cinema Player
 async function runCustomYTSearch() {
   const inputVal = document.getElementById("custom-yt-query")?.value.trim();
   const gridTarget = document.getElementById("custom-yt-results");
@@ -30,7 +42,7 @@ async function runCustomYTSearch() {
 
   if (!inputVal || !gridTarget) return;
 
-  labelStatus.innerText = "Searching global library indexes...";
+  labelStatus.innerText = "Searching YouTube library...";
   gridTarget.innerHTML = "";
 
   const targetEndpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(inputVal)}&type=video&key=${CUSTOM_YT_KEY}`;
@@ -67,38 +79,42 @@ async function runCustomYTSearch() {
       }
 
       const dynamicItem = document.createElement("div");
-      dynamicItem.style.cssText = "background: #161616; border: 1px solid #222; border-radius: 6px; overflow: hidden; cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;";
+      dynamicItem.style.cssText = "background: #161616; border: 1px solid #222; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;";
 
-      dynamicItem.onmouseenter = () => { dynamicItem.style.borderColor = '#3a3a3a'; dynamicItem.style.transform = 'translateY(-2px)'; };
+      dynamicItem.onmouseenter = () => { dynamicItem.style.borderColor = '#e2a33d'; dynamicItem.style.transform = 'translateY(-3px)'; };
       dynamicItem.onmouseleave = () => { dynamicItem.style.borderColor = '#222'; dynamicItem.style.transform = 'translateY(0)'; };
 
       dynamicItem.innerHTML = `
         <div style="position: relative; padding-bottom: 56.25%; background: #000; overflow: hidden;">
-          <img src="${thumbUrl}" alt="Preview" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; object-fit: cover; opacity: 0.85;">
-          <div class="play-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); opacity:0; transition: opacity 0.2s;">
-             <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <img src="${thumbUrl}" alt="Preview" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; object-fit: cover; opacity: 0.9;">
+          <div style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.3);">
+             <svg width="40" height="40" viewBox="0 0 24 24" fill="#e2a33d"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           </div>
         </div>
         <div style="padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-          <div style="font-size: 0.85rem; font-weight: 600; color: #eaeaea; line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 4px;">
+          <div style="font-size: 0.85rem; font-weight: 600; color: #eaeaea; line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 6px;">
             ${title}
           </div>
-          <div style="font-size: 0.75rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <div style="font-size: 0.75rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
             ${channelName}
           </div>
         </div>
       `;
 
+      // Click to Play in Big Featured Main Player Widescreen
       dynamicItem.onclick = function() {
-        const frameContainer = this.firstElementChild;
-        frameContainer.innerHTML = `
-          <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-                  src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowfullscreen>
-          </iframe>
-        `;
-        dynamicItem.onclick = null;
+        const mainPlayer = document.getElementById("custom-yt-main-player");
+        if (mainPlayer) {
+          mainPlayer.style.display = "block";
+          mainPlayer.innerHTML = `
+            <iframe style="width: 100%; height: 100%; border: 0; position: absolute; top: 0; left: 0;" 
+                    src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
+          `;
+          mainPlayer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       };
 
       gridTarget.appendChild(dynamicItem);
@@ -107,36 +123,6 @@ async function runCustomYTSearch() {
   } catch (err) {
     if (labelStatus) labelStatus.innerText = `Network Connection Blocked: ${err.message}`;
   }
-}
-
-// 3. Direct YT Player
-function initYTPlayer() {
-  const playBtn = document.getElementById("playBtn");
-  const ytInput = document.getElementById("ytUrl");
-  const player = document.getElementById("player");
-
-  if (!playBtn || !ytInput || !player) return;
-
-  playBtn.addEventListener("click", () => {
-    const val = ytInput.value.trim();
-    if (!val) return;
-
-    let videoId = val;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = val.match(regExp);
-
-    if (match && match[2].length === 11) {
-      videoId = match[2];
-    }
-
-    player.innerHTML = `
-      <iframe style="width: 100%; height: 380px; border: 0; border-radius: 6px;" 
-              src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowfullscreen>
-      </iframe>
-    `;
-  });
 }
 
 // 4. Calculator
@@ -194,8 +180,8 @@ function initNotes() {
 
 // 6. Application Initialization
 function initApp() {
+  initSidebarToggle();
   initTabs();
-  initYTPlayer();
   initCalculator();
   initNotes();
 
