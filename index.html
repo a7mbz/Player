@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -52,9 +51,28 @@
         </div>
         <div class="video-container" id="player"></div>
       </div>
-        </section>
+    </section>
+    
+    <!-- YT SEARCH PANEL -->
+    <section class="panel" id="panel-yt-search">
+      <div class="panel-header">
+        <h1>YT Search</h1>
+        <p>Search tracks or videos instantly using the Live YouTube API (Privacy Enhanced).</p>
+      </div>
+      <div class="instrument">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        
+        <div class="movie-controls" style="margin-bottom: 24px;">
+          <input type="text" id="custom-yt-query" placeholder="Type video names, music titles, or artists..." onkeyup="if(event.key === 'Enter') runCustomYTSearch();">
+          <button type="button" onclick="runCustomYTSearch()">Search</button>
+        </div>
 
-  
+        <div id="custom-yt-status" style="text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 16px; min-height: 1.2em;"></div>
+
+        <div id="custom-yt-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; width: 100%;"></div>
+      </div>
+    </section>  
+    
     <!-- CALCULATOR -->
     <section class="panel" id="panel-calc">
       <div class="panel-header">
@@ -105,28 +123,25 @@
       </div>
     </section>
     
-<!-- SPIDER SOLITAIRE TAB PANEL -->
-<section class="panel" id="panel-solitaire">
-  <div class="panel-header">
-    <h1>Spider Solitaire</h1>
-    <p>Play an unblocked round of classic Spider Solitaire.</p>
-  </div>
-  <div class="instrument" style="display: flex; justify-content: center; align-items: center; min-height: 250px;">
-    <!-- Corner rivets to match your theme's design style -->
-    <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
-    
-    <!-- Action Tab Button -->
-    <a href="https://htmlpreview.github.io/?https://github.com/lrusso/Spider/blob/master/Spider.htm" 
-       target="_blank" 
-       rel="noopener noreferrer" 
-       style="display: inline-flex; align-items: center; justify-content: center; background-color: #0b6623; color: white; text-decoration: none; font-size: 1.1rem; font-weight: bold; padding: 16px 32px; border: 2px solid #053b14; border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; font-family: inherit;">
-       <span style="margin-right: 10px; font-size: 1.4rem; line-height: 1;">♠</span> 
-       Launch Game in New Tab
-    </a>
-  </div>
-</section>
+    <!-- SPIDER SOLITAIRE PANEL -->
+    <section class="panel" id="panel-solitaire">
+      <div class="panel-header">
+        <h1>Spider Solitaire</h1>
+        <p>Play an unblocked round of classic Spider Solitaire.</p>
+      </div>
+      <div class="instrument" style="display: flex; justify-content: center; align-items: center; min-height: 250px;">
+        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
+        <a href="https://htmlpreview.github.io/?https://github.com/lrusso/Spider/blob/master/Spider.htm" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           style="display: inline-flex; align-items: center; justify-content: center; background-color: #0b6623; color: white; text-decoration: none; font-size: 1.1rem; font-weight: bold; padding: 16px 32px; border: 2px solid #053b14; border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; font-family: inherit;">
+           <span style="margin-right: 10px; font-size: 1.4rem; line-height: 1;">♠</span> 
+           Launch Game in New Tab
+        </a>
+      </div>
+    </section>
 
-      <!-- MOVIES PLAYER (SEARCH BY NAME) -->
+    <!-- MOVIES PLAYER -->
     <section class="panel" id="panel-movies">
       <div class="panel-header">
         <h1>Movies & Shows Player</h1>
@@ -135,7 +150,6 @@
       <div class="instrument">
         <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
         
-        <!-- شريط البحث بالاسم -->
         <div class="movie-controls">
           <input type="text" id="movieSearchInput" placeholder="Search movie or TV show name (e.g. Silo, Batman)...">
           <select id="movieTypeSelect">
@@ -145,17 +159,14 @@
           <button id="searchMovieBtn">Search</button>
         </div>
 
-        <!-- نتائج البحث بالصور -->
         <div id="searchResults" class="search-results-grid"></div>
 
-        <!-- أزرار الموسم والحلقة للمسلسلات -->
         <div class="tv-controls" id="tvControls" style="display: none;">
           <input type="number" id="tvSeasonInput" placeholder="Season" value="1" min="1">
           <input type="number" id="tvEpisodeInput" placeholder="Episode" value="1" min="1">
           <button id="updateTvBtn">Update Episode</button>
         </div>
 
-        <!-- أزرار السيرفرات -->
         <div class="movie-servers">
           <span class="server-label">Servers:</span>
           <button class="server-btn active" data-server="vidsrc">VidSrc</button>
@@ -163,17 +174,15 @@
           <button class="server-btn" data-server="embed2">2Embed</button>
         </div>
 
-        <!-- المشغل -->
         <div class="video-container" id="moviePlayerContainer">
           <iframe id="movieIframe" src="https://vidsrc.to/embed/movie/550" allowfullscreen></iframe>
         </div>
       </div>
     </section>
 
-
   </main>
 </div>
 
-  
+<script src="js/script.js"></script>
 </body>
 </html>
