@@ -200,211 +200,128 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 400);
   });
 
-  /* ---------------- Unit Converter ---------------- */
-  const convUnits = {
-    length: { base: 'meters', units: { meters: 1, kilometers: 1000, centimeters: 0.01, miles: 1609.344, feet: 0.3048, inches: 0.0254 } },
-    weight: { base: 'grams', units: { grams: 1, kilograms: 1000, pounds: 453.59237, ounces: 28.349523125 } },
-    temperature: { base: 'celsius', units: { celsius: 1, fahrenheit: 1, kelvin: 1 } }
-  };
 
-  const convCategory = document.getElementById('convCategory');
-  const convFrom = document.getElementById('convFrom');
-  const convTo = document.getElementById('convTo');
-  const convInput = document.getElementById('convInput');
-  const convResult = document.getElementById('convResult');
+<!-- LIVE SEARCH EXECUTION ENGINE -->
+<script>
+  // 🔑 YOUR GOOGLE YOUTUBE V3 API KEY
+  const CUSTOM_YT_KEY = "AIzaSyCgEU5RK5bwqoDrV5QRORXc-E_2M2HjKNY"; 
 
-  function populateUnitSelects() {
-    const cat = convCategory.value;
-    const unitNames = Object.keys(convUnits[cat].units);
-    convFrom.innerHTML = unitNames.map(u => `<option value="${u}">${capitalize(u)}</option>`).join('');
-    convTo.innerHTML = unitNames.map(u => `<option value="${u}">${capitalize(u)}</option>`).join('');
-    convTo.selectedIndex = unitNames.length > 1 ? 1 : 0;
-  }
+  async function runCustomYTSearch() {
+    const inputVal = document.getElementById("custom-yt-query").value.trim();
+    const gridTarget = document.getElementById("custom-yt-results");
+    const labelStatus = document.getElementById("custom-yt-status");
 
-  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+    if (!inputVal) return;
 
-  function convCategoryChanged() { populateUnitSelects(); convertUnits(); }
+    labelStatus.innerText = "Searching global library indexes...";
+    gridTarget.innerHTML = ""; 
 
-  function tempToCelsius(value, unit) {
-    if (unit === 'celsius') return value;
-    if (unit === 'fahrenheit') return (value - 32) * 5 / 9;
-    if (unit === 'kelvin') return value - 273.15;
-  }
+    // Explicit direct URL endpoint parameter configuration string
+    const targetEndpoint = `https://googleapis.com{encodeURIComponent(inputVal)}&type=video&key=${CUSTOM_YT_KEY}`;
 
-  function celsiusToTemp(value, unit) {
-    if (unit === 'celsius') return value;
-    if (unit === 'fahrenheit') return (value * 9 / 5) + 32;
-    if (unit === 'kelvin') return value + 273.15;
-  }
+    try {
+      const apiFetch = await fetch(targetEndpoint);
+      const payloadResult = await apiFetch.json();
 
-  function convertUnits() {
-    const cat = convCategory.value;
-    const from = convFrom.value;
-    const to = convTo.value;
-    const value = parseFloat(convInput.value);
+      // Catch structural errors returned directly by Google's API server
+      if (!apiFetch.ok) {
+        console.error("Google API Failure Object:", payloadResult);
+        const errMessage = payloadResult.error ? payloadResult.error.message : "Unknown Connection Failure";
+        labelStatus.innerText = `Google API Error: ${errMessage}`;
+        return;
+      }
+      
+      labelStatus.innerText = ""; 
 
-    if (isNaN(value)) { convResult.innerHTML = '—'; return; }
+      if (!payloadResult.items || payloadResult.items.length === 0) {
+        labelStatus.innerText = "No video matches found.";
+        return;
+      }
 
-    let result;
-    if (cat === 'temperature') {
-      const celsius = tempToCelsius(value, from);
-      result = celsiusToTemp(celsius, to);
-    } else {
-      const units = convUnits[cat].units;
-      const base = value * units[from];
-      result = base / units[to];
+      payloadResult.items.forEach(videoItem => {
+        if (!videoItem.id || !videoItem.snippet) return;
+        
+        const id = videoItem.id.videoId;
+        if (!id) return; 
+
+        const title = videoItem.snippet.title || "No Title";
+        const channelName = videoItem.snippet.channelTitle || "Unknown Channel";
+        
+        let thumbUrl = "https://unsplash.com"; 
+        if (videoItem.snippet.thumbnails && videoItem.snippet.thumbnails.high) {
+          thumbUrl = videoItem.snippet.thumbnails.high.url;
+        }
+
+        const dynamicItem = document.createElement("div");
+        dynamicItem.style.cssText = "background: #161616; border: 1px solid #222; border-radius: 6px; overflow: hidden; cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;";
+        
+        dynamicItem.onmouseenter = () => { dynamicItem.style.borderColor = '#3a3a3a'; dynamicItem.style.transform = 'translateY(-2px)'; };
+        dynamicItem.onmouseleave = () => { dynamicItem.style.borderColor = '#222'; dynamicItem.style.transform = 'translateY(0)'; };
+
+        dynamicItem.innerHTML = `
+          <div style="position: relative; padding-bottom: 56.25%; background: #000; overflow: hidden;">
+            <img src="${thumbUrl}" alt="Preview" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; object-fit: cover; opacity: 0.85;">
+            <div class="play-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); opacity:0; transition: opacity 0.2s;">
+               <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+          </div>
+          <div style="padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="font-size: 0.85rem; font-weight: 600; color: #eaeaea; line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 4px;">
+              ${title}
+            </div>
+            <div style="font-size: 0.75rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${channelName}
+            </div>
+          </div>
+        `;
+
+        dynamicItem.onclick = function() {
+          const frameContainer = this.firstElementChild;
+          // Privacy protection domain without cookies
+          frameContainer.innerHTML = `
+            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+                    src="https://youtube-nocookie.com{id}?autoplay=1" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
+          `;
+          dynamicItem.onclick = null; 
+        };
+
+        const overlay = dynamicItem.querySelector('.play-overlay');
+        dynamicItem.addEventListener('mouseenter', () => overlay.style.opacity = '1');
+        dynamicItem.addEventListener('mouseleave', () => overlay.style.opacity = '0');
+
+        gridTarget.appendChild(dynamicItem);
+      });
+
+    } catch (err) {
+      console.error(err);
+      labelStatus.innerText = `Network Connection Blocked: ${err.message}`;
     }
-
-    const rounded = Math.round(result * 10000) / 10000;
-    convResult.innerHTML = `${rounded} <span class="unit">${capitalize(to)}</span>`;
   }
 
-  convCategory.addEventListener('change', convCategoryChanged);
-  convFrom.addEventListener('change', convertUnits);
-  convTo.addEventListener('change', convertUnits);
-  convInput.addEventListener('input', convertUnits);
+  // Navigation Panel Integration Sidebar Script Hooks
+  document.addEventListener("DOMContentLoaded", () => {
+    const switches = document.querySelectorAll(".rail .tool-switch");
+    const panels = document.querySelectorAll("main.main .panel");
 
-  populateUnitSelects();
-  convertUnits();
-
-  /* ---------------- To-Do List ---------------- */
-  const todoInput = document.getElementById('todoInput');
-  const todoListEl = document.getElementById('todoList');
-  const addTodoBtn = document.getElementById('addTodoBtn');
-  let todos = JSON.parse(localStorage.getItem('toolkit_todos') || '[]');
-
-  function saveTodos() { localStorage.setItem('toolkit_todos', JSON.stringify(todos)); }
-
-  function renderTodos() {
-    if (todos.length === 0) {
-      todoListEl.innerHTML = '<li class="todo-empty" style="list-style:none;">Nothing here yet — add your first task above.</li>';
-      return;
-    }
-    todoListEl.innerHTML = todos.map((t, i) => `
-      <li class="${t.done ? 'done' : ''}">
-        <input type="checkbox" ${t.done ? 'checked' : ''} data-todo-toggle="${i}">
-        <span class="txt">${escapeHtml(t.text)}</span>
-        <button class="del" data-todo-del="${i}">✕</button>
-      </li>
-    `).join('');
-
-    todoListEl.querySelectorAll('[data-todo-toggle]').forEach(cb => {
-      cb.addEventListener('change', (e) => toggleTodo(e.target.dataset.todoToggle));
-    });
-
-    todoListEl.querySelectorAll('[data-todo-del]').forEach(btn => {
-      btn.addEventListener('click', (e) => deleteTodo(e.target.dataset.todoDel));
-    });
-  }
-
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  function addTodo() {
-    const val = todoInput.value.trim();
-    if (!val) return;
-    todos.push({ text: val, done: false });
-    todoInput.value = '';
-    saveTodos();
-    renderTodos();
-  }
-
-  function toggleTodo(i) { todos[i].done = !todos[i].done; saveTodos(); renderTodos(); }
-  function deleteTodo(i) { todos.splice(i, 1); saveTodos(); renderTodos(); }
-
-  addTodoBtn.addEventListener('click', addTodo);
-  todoInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTodo(); });
-
-  renderTodos();
-
-  /* ---------------- Native Solitaire Engine ---------------- */
-  const suits = ['♥', '♦', '♣', '♠'];
-  const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-  let moves = 0, score = 0;
-  let deck = [], stock = [], waste = [], tableau = [[], [], [], [], [], [], []];
-
-  const newGameBtn = document.getElementById('solitaireNewGame');
-  if (newGameBtn) newGameBtn.addEventListener('click', initSolitaire);
-
-  function initSolitaire() {
-    moves = 0; score = 0;
-    document.getElementById('solitaireMoves').textContent = moves;
-    document.getElementById('solitaireScore').textContent = score;
-
-    deck = [];
-    suits.forEach(suit => {
-      const isRed = suit === '♥' || suit === '♦';
-      values.forEach((val, idx) => {
-        deck.push({ value: val, rank: idx + 1, suit: suit, isRed: isRed, faceUp: false });
+    switches.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetAttr = btn.getAttribute("data-panel");
+        if (targetAttr === "yt-search") {
+          switches.forEach(s => s.classList.remove("active"));
+          panels.forEach(p => p.classList.remove("active"));
+          
+          btn.classList.add("active");
+          const searchPanel = document.getElementById("panel-yt-search");
+          if (searchPanel) searchPanel.classList.add("active");
+        }
       });
     });
+  });
+</script>
 
-    for (let i = deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-
-    tableau = [[], [], [], [], [], [], []];
-    for (let i = 0; i < 7; i++) {
-      for (let j = 0; j <= i; j++) {
-        const card = deck.pop();
-        if (j === i) card.faceUp = true;
-        tableau[i].push(card);
-      }
-    }
-
-    stock = deck; waste = [];
-    renderBoard();
-  }
-
-  function renderBoard() {
-    const stockEl = document.getElementById('solStock');
-    stockEl.innerHTML = '';
-    if (stock.length > 0) stockEl.appendChild(createCardElement(stock[stock.length - 1], false));
-
-    const wasteEl = document.getElementById('solWaste');
-    wasteEl.innerHTML = '';
-    if (waste.length > 0) wasteEl.appendChild(createCardElement(waste[waste.length - 1], true));
-
-    const tableauPiles = document.querySelectorAll('.tableau-pile');
-    tableauPiles.forEach((pileEl, index) => {
-      pileEl.innerHTML = '';
-      tableau[index].forEach((card, cardIndex) => {
-        const cardEl = createCardElement(card, card.faceUp);
-        cardEl.style.top = `${cardIndex * 22}px`;
-        pileEl.appendChild(cardEl);
-      });
-    });
-  }
-
-  function createCardElement(card, faceUp = true) {
-    const el = document.createElement('div');
-    el.className = `sol-card ${card.isRed ? 'red' : 'black'} ${faceUp ? '' : 'back'}`;
-    if (faceUp) {
-      el.innerHTML = `<div>${card.value}</div><div class="card-suit">${card.suit}</div>`;
-    }
-    return el;
-  }
-
-  const stockEl = document.getElementById('solStock');
-  if (stockEl) {
-    stockEl.addEventListener('click', () => {
-      if (stock.length > 0) {
-        const card = stock.pop();
-        card.faceUp = true;
-        waste.push(card);
-      } else if (waste.length > 0) {
-        stock = waste.reverse().map(c => ({ ...c, faceUp: false }));
-        waste = [];
-      }
-      moves++;
-      document.getElementById('solitaireMoves').textContent = moves;
-      renderBoard();
-    });
-  }
 
   initSolitaire();
 });
