@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎃My Toolkit🎃</title>
+  <title>🎃 My Toolkit 🎃</title>
   <link rel="icon" type="image/png" href="assets/icons/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +25,7 @@
 </header>
 
 <div class="app">
+  <!-- SIDEBAR NAVIGATION -->
   <aside class="rail">
     <div class="rail-label">TOOLS</div>
     <button class="tool-switch active" data-panel="yt"><span class="dot"></span>YT Player</button>
@@ -35,9 +36,10 @@
     <button class="tool-switch" data-panel="movies"><span class="dot"></span>Movies Player</button>
   </aside>
 
+  <!-- MAIN PANELS -->
   <main class="main">
     
-    <!-- YT PLAYER -->
+    <!-- 1. YT PLAYER -->
     <section class="panel active" id="panel-yt">
       <div class="panel-header">
         <h1>YT Player</h1>
@@ -46,14 +48,14 @@
       <div class="instrument">
         <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
         <div class="yt-row">
-          <input type="text" id="ytUrl" placeholder="Video link here ...">
-          <button id="playBtn">Play</button>
+          <input type="text" id="ytUrl" placeholder="Video link or ID here ...">
+          <button type="button" id="playBtn">Play</button>
         </div>
         <div class="video-container" id="player"></div>
       </div>
     </section>
     
-    <!-- YT SEARCH PANEL -->
+    <!-- 2. YT SEARCH PANEL -->
     <section class="panel" id="panel-yt-search">
       <div class="panel-header">
         <h1>YT Search</h1>
@@ -63,8 +65,8 @@
         <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
         
         <div class="movie-controls" style="margin-bottom: 24px;">
-          <input type="text" id="custom-yt-query" placeholder="Type video names, music titles, or artists..." onkeyup="if(event.key === 'Enter') runCustomYTSearch();">
-          <button type="button" onclick="runCustomYTSearch()">Search</button>
+          <input type="text" id="custom-yt-query" placeholder="Type video names, music titles, or artists...">
+          <button type="button" id="search-yt-btn">Search</button>
         </div>
 
         <div id="custom-yt-status" style="text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 16px; min-height: 1.2em;"></div>
@@ -73,7 +75,7 @@
       </div>
     </section>  
     
-    <!-- CALCULATOR -->
+    <!-- 3. CALCULATOR -->
     <section class="panel" id="panel-calc">
       <div class="panel-header">
         <h1>Calculator</h1>
@@ -110,7 +112,7 @@
       </div>
     </section>
 
-    <!-- NOTES -->
+    <!-- 4. NOTES -->
     <section class="panel" id="panel-notes">
       <div class="panel-header">
         <h1>Notes</h1>
@@ -123,7 +125,7 @@
       </div>
     </section>
     
-    <!-- SPIDER SOLITAIRE PANEL -->
+    <!-- 5. SPIDER SOLITAIRE PANEL -->
     <section class="panel" id="panel-solitaire">
       <div class="panel-header">
         <h1>Spider Solitaire</h1>
@@ -141,7 +143,7 @@
       </div>
     </section>
 
-    <!-- MOVIES PLAYER -->
+    <!-- 6. MOVIES PLAYER -->
     <section class="panel" id="panel-movies">
       <div class="panel-header">
         <h1>Movies & Shows Player</h1>
@@ -156,7 +158,7 @@
             <option value="movie">Movie</option>
             <option value="tv">TV Series</option>
           </select>
-          <button id="searchMovieBtn">Search</button>
+          <button type="button" id="searchMovieBtn">Search</button>
         </div>
 
         <div id="searchResults" class="search-results-grid"></div>
@@ -164,14 +166,14 @@
         <div class="tv-controls" id="tvControls" style="display: none;">
           <input type="number" id="tvSeasonInput" placeholder="Season" value="1" min="1">
           <input type="number" id="tvEpisodeInput" placeholder="Episode" value="1" min="1">
-          <button id="updateTvBtn">Update Episode</button>
+          <button type="button" id="updateTvBtn">Update Episode</button>
         </div>
 
         <div class="movie-servers">
           <span class="server-label">Servers:</span>
-          <button class="server-btn active" data-server="vidsrc">VidSrc</button>
-          <button class="server-btn" data-server="autoembed">AutoEmbed</button>
-          <button class="server-btn" data-server="embed2">2Embed</button>
+          <button type="button" class="server-btn active" data-server="vidsrc">VidSrc</button>
+          <button type="button" class="server-btn" data-server="autoembed">AutoEmbed</button>
+          <button type="button" class="server-btn" data-server="embed2">2Embed</button>
         </div>
 
         <div class="video-container" id="moviePlayerContainer">
