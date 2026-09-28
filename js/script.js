@@ -2,7 +2,7 @@
 const CUSTOM_YT_KEY = "AIzaSyD4won1S7jxZsKaw4f29vo8he-fizrV2kw";
 
 // 🔑 YOUR TMDB API KEY FOR MOVIES & TV SHOWS (Get a free one at https://www.themoviedb.org)
-const TMDB_API_KEY = "YOUR_TMDB_API_KEY";
+const TMDB_API_KEY = "fcce0232e1b2c62f49a2f6f641851c23";
 
 // -----------------------------------------------------------------
 // 1. Sidebar Collapse / Expand Functionality
