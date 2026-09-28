@@ -2,7 +2,7 @@
 // Deploy with: npx wrangler deploy   (or paste into the Workers dashboard)
 
 const UPSTREAM = 'https://browser.lol';
-const ALLOWED_PARENTS = ['https://a7mbz.github.io'];
+const ALLOWED_PARENTS = ['https://a7mbz.github.io', 'https://a7mbz.github.io/tk', 'https://a7mbz.github.io/tk/browser/' ];
 
 export default {
   async fetch(request) {
