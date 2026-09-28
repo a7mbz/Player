@@ -197,151 +197,49 @@
 
 <script>
 (() => {
-  // ---- Config ---------------------------------------------------------
-  // Set your Worker address here, or leave empty and enter it in the page.
   const DEFAULT_PROXY = "https://bp.bouziane-ahs.workers.dev";
-  const STORAGE_KEY = "toolkit.browser.proxy";
-  const LOAD_TIMEOUT_MS = 20000;
+  const frame = document.getElementById("frame");
+  const btnConnect = document.getElementById("btnConnect");
+  const statusText = document.getElementById("statusText");
+  const lamp = document.getElementById("lamp");
+  const ovIdle = document.getElementById("ovIdle");
 
-  // ---- Elements -------------------------------------------------------
-  const $ = id => document.getElementById(id);
-  const frame = $("frame"), lamp = $("lamp"), statusText = $("statusText");
-  const ovIdle = $("ovIdle"), ovSettings = $("ovSettings"), ovError = $("ovError");
-  const btnConnect = $("btnConnect"), btnReload = $("btnReload"), btnFull = $("btnFull");
-  const btnOpen = $("btnOpen"), btnErrOpen = $("btnErrOpen");
-  const proxyInput = $("proxyInput");
-
-  let timer = null;
-
-  // ---- Storage (safe) -------------------------------------------------
-  const store = {
-    get() { try { return localStorage.getItem(STORAGE_KEY) || ""; } catch { return ""; } },
-    set(v) { try { localStorage.setItem(STORAGE_KEY, v); } catch {} }
-  };
-  const getProxy = () => store.get() || DEFAULT_PROXY;
-
-  // ---- UI helpers -----------------------------------------------------
   function setStatus(kind, text) {
     lamp.className = "lamp " + (kind || "");
     statusText.textContent = text;
   }
-  function showOverlay(which) {
-    [ovIdle, ovSettings, ovError].forEach(o => o.classList.toggle("show", o === which));
-  }
-  function setOpenLinks(url) {
-    [btnOpen, btnErrOpen].forEach(a => {
-      a.href = url || "#";
-      a.setAttribute("aria-disabled", url ? "false" : "true");
-    });
-  }
-  function fail(title, body) {
-    clearTimeout(timer);
-    frame.hidden = true;
-    frame.removeAttribute("src");
-    $("errTitle").textContent = title;
-    $("errBody").textContent = body;
-    setStatus("bad", "Disconnected");
-    btnReload.disabled = true;
-    btnFull.disabled = true;
-    showOverlay(ovError);
-  }
 
-  function normalize(url) {
-    try {
-      const u = new URL(url.trim());
-      if (u.protocol !== "https:") return "";
-      return u.origin + "/";
-    } catch { return ""; }
-  }
-
-  // ---- Connect --------------------------------------------------------
   async function connect() {
-    const proxy = normalize(getProxy());
-    if (!proxy) { openSettings(); return; }
-    setOpenLinks(proxy);
-    setStatus("busy", "Checking proxy…");
+    setStatus("busy", "Initializing Hyperbeam VM…");
     btnConnect.disabled = true;
 
-    // Reachability check (opaque response is fine; a network error is not)
     try {
-      await fetch(proxy, { mode: "no-cors", cache: "no-store" });
-    } catch {
+      // Call your Cloudflare Worker to request a new session
+      const res = await fetch(DEFAULT_PROXY);
+      const data = await res.json();
+
+      if (!data.embed_url) {
+        throw new Error(data.error || "Failed to retrieve embed URL");
+      }
+
+      // Hide idle overlay and load the VM inside the iframe
+      ovIdle.classList.remove("show");
+      frame.hidden = false;
+      frame.src = data.embed_url;
+
+      frame.onload = () => {
+        setStatus("ok", "Connected");
+        btnConnect.disabled = false;
+        btnConnect.textContent = "Reconnect";
+      };
+    } catch (err) {
       btnConnect.disabled = false;
-      fail("Proxy not reachable",
-           "The Worker did not respond. Check that it is deployed and that the address in Proxy address is correct.");
-      return;
+      setStatus("bad", "Connection failed");
+      alert("Error starting VM: " + err.message);
     }
-
-    setStatus("busy", "Loading browser…");
-    frame.hidden = false;
-    showOverlay(null);
-
-    frame.onload = () => {
-      clearTimeout(timer);
-      setStatus("ok", "Connected");
-      btnReload.disabled = false;
-      btnFull.disabled = false;
-      btnConnect.disabled = false;
-      btnConnect.textContent = "Reconnect";
-    };
-    frame.onerror = () => {
-      btnConnect.disabled = false;
-      fail("Could not load the browser", "The frame failed to load. Try again, or open it in a new tab.");
-    };
-    timer = setTimeout(() => {
-      btnConnect.disabled = false;
-      fail("Taking too long",
-           "The browser did not finish loading. The site may be blocking the proxy. You can still open it in a new tab.");
-    }, LOAD_TIMEOUT_MS);
-
-    frame.src = proxy;
   }
 
-  // ---- Settings -------------------------------------------------------
-  function openSettings() {
-    proxyInput.value = getProxy();
-    showOverlay(ovSettings);
-    proxyInput.focus();
-  }
-  function saveSettings() {
-    const clean = normalize(proxyInput.value);
-    if (!clean) {
-      proxyInput.setCustomValidity("Enter a full https:// address.");
-      proxyInput.reportValidity();
-      return;
-    }
-    proxyInput.setCustomValidity("");
-    store.set(clean);
-    setOpenLinks(clean);
-    showOverlay(ovIdle);
-    setStatus("", "Not connected");
-  }
-
-  // ---- Events ---------------------------------------------------------
   btnConnect.addEventListener("click", connect);
-  $("btnRetry").addEventListener("click", connect);
-  btnReload.addEventListener("click", () => {
-    setStatus("busy", "Reloading…");
-    const src = frame.src;
-    frame.src = "about:blank";
-    setTimeout(() => { frame.src = src; }, 50);
-  });
-  btnFull.addEventListener("click", () => {
-    if (frame.requestFullscreen) frame.requestFullscreen().catch(() => {});
-  });
-  $("btnSettings").addEventListener("click", openSettings);
-  $("btnSave").addEventListener("click", saveSettings);
-  $("btnCancel").addEventListener("click", () => showOverlay(ovIdle));
-  proxyInput.addEventListener("input", () => proxyInput.setCustomValidity(""));
-  proxyInput.addEventListener("keydown", e => { if (e.key === "Enter") saveSettings(); });
-  [btnOpen].forEach(a => a.addEventListener("click", e => {
-    if (a.getAttribute("aria-disabled") === "true") { e.preventDefault(); openSettings(); }
-  }));
-
-  // ---- Init -----------------------------------------------------------
-  const initial = normalize(getProxy());
-  if (initial) setOpenLinks(initial);
-  else showOverlay(ovSettings), proxyInput.value = "";
 })();
 </script>
 </body>
