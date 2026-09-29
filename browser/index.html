@@ -1,246 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Browser · Toolkit</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #12100c;
-    --panel: #1b1812;
-    --panel-2: #241f16;
-    --line: #3a3324;
-    --text: #efe8d8;
-    --muted: #9a917c;
-    --amber: #e8a83a;
-    --amber-dim: #8a6420;
-    --ok: #7fc47a;
-    --bad: #e2705a;
-  }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Inter", system-ui, sans-serif;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    gap: 12px;
-  }
-  a { color: var(--amber); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-
-  header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  h1 {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: 0.01em;
-  }
-  .back { font-size: 14px; color: var(--muted); }
-  .status {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--muted);
-  }
-  .lamp {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--amber-dim);
-    box-shadow: 0 0 0 3px rgba(232,168,58,.12);
-  }
-  .lamp.ok  { background: var(--ok);  box-shadow: 0 0 8px var(--ok); }
-  .lamp.bad { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
-  .lamp.busy { background: var(--amber); animation: pulse 1s ease-in-out infinite; }
-  @keyframes pulse { 50% { opacity: .35; } }
-
-  .bar {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 8px;
-  }
-  button, .btn {
-    font: 500 14px "Inter", sans-serif;
-    color: var(--text);
-    background: var(--panel-2);
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    padding: 8px 14px;
-    cursor: pointer;
-    text-decoration: none;
-  }
-  button:hover, .btn:hover { border-color: var(--amber); text-decoration: none; }
-  button.primary { background: var(--amber); color: #1a1408; border-color: var(--amber); font-weight: 600; }
-  button:disabled { opacity: .45; cursor: not-allowed; }
-  .spacer { flex: 1; }
-
-  .stage {
-    position: relative;
-    flex: 1;
-    min-height: 320px;
-    background: #000;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
-
-  .overlay {
-    position: absolute; inset: 0;
-    display: none;
-    align-items: center; justify-content: center;
-    padding: 24px;
-    background: var(--panel);
-  }
-  .overlay.show { display: flex; }
-  .card { max-width: 520px; width: 100%; }
-  .card h2 { font-family: "Space Grotesk", sans-serif; font-size: 20px; margin: 0 0 8px; }
-  .card p { color: var(--muted); line-height: 1.55; margin: 0 0 16px; font-size: 15px; }
-  .field { display: flex; gap: 8px; flex-wrap: wrap; }
-  input[type="url"] {
-    flex: 1; min-width: 220px;
-    font: 14px "Inter", sans-serif;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    padding: 9px 12px;
-  }
-  .hint { font-size: 13px; color: var(--muted); margin-top: 10px; }
-
-  footer { font-size: 13px; color: var(--muted); }
-
-  @media (prefers-reduced-motion: reduce) { .lamp.busy { animation: none; } }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser • Toolkit</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #181b22;
+      --border: #2a2e39;
+      --text: #e1e4e8;
+      --text-dim: #8b949e;
+      --accent: #238636;
+      --accent-hover: #2ea043;
+      --danger: #da3633;
+      --warn: #d29922;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+    .nav-left, .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h1 { font-size: 16px; font-weight: 600; color: var(--text); }
+    a.back { color: var(--text-dim); text-decoration: none; font-size: 14px; }
+    a.back:hover { color: var(--text); }
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary { background: #21262d; border: 1px solid var(--border); color: var(--text); }
+    .btn-secondary:hover { background: #30363d; }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .lamp {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+    .lamp.ok { background: var(--accent); box-shadow: 0 0 8px rgba(35, 134, 54, 0.6); }
+    .lamp.busy { background: var(--warn); box-shadow: 0 0 8px rgba(210, 153, 34, 0.6); }
+    .lamp.bad { background: var(--danger); box-shadow: 0 0 8px rgba(218, 54, 51, 0.6); }
+    
+    .workspace {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+    .overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .overlay h2 { font-size: 20px; font-weight: 500; }
+    .overlay p { color: var(--text-dim); font-size: 14px; max-width: 400px; text-align: center; }
+  </style>
 </head>
 <body>
 
-<header>
-  <a class="back" href="../">← Toolkit</a>
-  <h1>Remote Browser</h1>
-  <div class="status" role="status" aria-live="polite">
-    <span id="lamp" class="lamp"></span><span id="statusText">Not connected</span>
-  </div>
-</header>
-
-<div class="bar">
-  <button id="btnConnect" class="primary">Connect</button>
-  <button id="btnReload" disabled>Reload</button>
-  <button id="btnFull" disabled>Full screen</button>
-  <a id="btnOpen" class="btn" target="_blank" rel="noopener" href="#" aria-disabled="true">Open in new tab</a>
-  <span class="spacer"></span>
-  <button id="btnSettings">Proxy address</button>
-</div>
-
-<div class="stage">
-  <iframe id="frame" title="Remote browser"
-          allow="clipboard-read; clipboard-write; fullscreen; autoplay; microphone; camera"
-          referrerpolicy="strict-origin-when-cross-origin"
-          hidden></iframe>
-
-  <!-- Idle -->
-  <div id="ovIdle" class="overlay show">
-    <div class="card">
-      <h2>Start a remote browser</h2>
-      <p>The browser runs on a remote server and streams to this page through your proxy. Select Connect to begin.</p>
+  <header>
+    <div class="nav-left">
+      <a href="../" class="back">← Toolkit</a>
+      <span style="color: var(--border);">/</span>
+      <h1>Remote Browser</h1>
     </div>
-  </div>
-
-  <!-- Settings / first run -->
-  <div id="ovSettings" class="overlay">
-    <div class="card">
-      <h2>Proxy address</h2>
-      <p>Paste the address of your Cloudflare Worker. It is saved in this browser only.</p>
-      <div class="field">
-        <input id="proxyInput" type="url" placeholder="https://browser-proxy.yourname.workers.dev/" autocomplete="off" spellcheck="false">
-        <button id="btnSave" class="primary">Save</button>
-        <button id="btnCancel">Cancel</button>
+    <div class="nav-right">
+      <div class="status-indicator">
+        <div id="lamp" class="lamp"></div>
+        <span id="statusText">Disconnected</span>
       </div>
-      <div class="hint">Deploy <code>worker.js</code> first, then paste its address here.</div>
+      <button id="btnConnect" class="btn">Connect Session</button>
+      <button id="btnReload" class="btn btn-secondary" disabled>Reload</button>
+      <button id="btnFullscreen" class="btn btn-secondary" disabled>Fullscreen</button>
     </div>
+  </header>
+
+  <div class="workspace">
+    <div id="ovIdle" class="overlay">
+      <h2>Cloud Virtual Browser</h2>
+      <p>Click "Connect Session" below to initialize a secure isolated browser instance running Google.</p>
+      <button id="btnConnectCenter" class="btn" style="padding: 10px 20px; font-size: 14px;">Start Session</button>
+    </div>
+    <iframe id="frame" allow="clipboard-read; clipboard-write; microphone; camera"></iframe>
   </div>
 
-  <!-- Error -->
-  <div id="ovError" class="overlay">
-    <div class="card">
-      <h2 id="errTitle">Could not load the browser</h2>
-      <p id="errBody"></p>
-      <div class="field">
-        <button id="btnRetry" class="primary">Try again</button>
-        <a id="btnErrOpen" class="btn" target="_blank" rel="noopener" href="#">Open in new tab</a>
-      </div>
-    </div>
-  </div>
-</div>
+  <script>
+    (() => {
+      const WORKER_URL = "https://divine-water-1feb.bouziane-ahs.workers.dev";
+      const frame = document.getElementById("frame");
+      const btnConnect = document.getElementById("btnConnect");
+      const btnConnectCenter = document.getElementById("btnConnectCenter");
+      const btnReload = document.getElementById("btnReload");
+      const btnFullscreen = document.getElementById("btnFullscreen");
+      const statusText = document.getElementById("statusText");
+      const lamp = document.getElementById("lamp");
+      const ovIdle = document.getElementById("ovIdle");
 
-<footer>
-  Powered by <a href="https://browser.lol" target="_blank" rel="noopener">browser.lol</a>, served through a private proxy. Educational project.
-</footer>
-
-<script>
-(() => {
-  const DEFAULT_PROXY = "https://divine-water-1feb.bouziane-ahs.workers.dev";
-  const frame = document.getElementById("frame");
-  const btnConnect = document.getElementById("btnConnect");
-  const statusText = document.getElementById("statusText");
-  const lamp = document.getElementById("lamp");
-  const ovIdle = document.getElementById("ovIdle");
-
-  function setStatus(kind, text) {
-    lamp.className = "lamp " + (kind || "");
-    statusText.textContent = text;
-  }
-
-  async function connect() {
-    setStatus("busy", "Initializing Hyperbeam VM…");
-    btnConnect.disabled = true;
-
-    try {
-      // Call your Cloudflare Worker to request a new session
-      const res = await fetch(DEFAULT_PROXY);
-      const data = await res.json();
-
-      if (!data.embed_url) {
-        throw new Error(data.error || "Failed to retrieve embed URL");
+      function setStatus(kind, text) {
+        lamp.className = "lamp " + (kind || "");
+        statusText.textContent = text;
       }
 
-      // Hide idle overlay and load the VM inside the iframe
-      ovIdle.classList.remove("show");
-      frame.hidden = false;
-      frame.src = data.embed_url;
+      async function connectSession() {
+        setStatus("busy", "Spawning VM instance…");
+        btnConnect.disabled = true;
+        if(btnConnectCenter) btnConnectCenter.disabled = true;
 
-      frame.onload = () => {
-        setStatus("ok", "Connected");
-        btnConnect.disabled = false;
-        btnConnect.textContent = "Reconnect";
-      };
-    } catch (err) {
-      btnConnect.disabled = false;
-      setStatus("bad", "Connection failed");
-      alert("Error starting VM: " + err.message);
-    }
-  }
+        try {
+          const res = await fetch(WORKER_URL);
+          const data = await res.json();
 
-  btnConnect.addEventListener("click", connect);
-})();
-</script>
+          if (!res.ok || !data.embed_url) {
+            throw new Error(data.error || "Failed to establish remote browser stream");
+          }
+
+          frame.src = data.embed_url;
+          
+          frame.onload = () => {
+            ovIdle.classList.add("hidden");
+            setStatus("ok", "Active");
+            btnConnect.disabled = false;
+            btnConnect.textContent = "Reconnect";
+            btnReload.disabled = false;
+            btnFullscreen.disabled = false;
+            if(btnConnectCenter) btnConnectCenter.disabled = false;
+          };
+
+        } catch (err) {
+          setStatus("bad", "Connection failed");
+          btnConnect.disabled = false;
+          if(btnConnectCenter) btnConnectCenter.disabled = false;
+          alert(err.message);
+        }
+      }
+
+      btnConnect.addEventListener("click", connectSession);
+      if(btnConnectCenter) btnConnectCenter.addEventListener("click", connectSession);
+
+      btnReload.addEventListener("click", () => {
+        if (frame.src) frame.contentWindow.location.reload();
+      });
+
+      btnFullscreen.addEventListener("click", () => {
+        if (frame.requestFullscreen) {
+          frame.requestFullscreen();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
