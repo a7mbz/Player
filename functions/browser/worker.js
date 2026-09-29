@@ -2,7 +2,6 @@ const HYPERBEAM_API_KEY = "sk_test_Vei3dyN32a3a3txdJgKL9djfb9J4Pu86ayeGzn7b_m0";
 
 export default {
   async fetch(request) {
-    // 1. Handle CORS preflight checks
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
@@ -14,7 +13,6 @@ export default {
     }
 
     try {
-      // 2. Request a new browser VM session from Hyperbeam
       const hbResponse = await fetch("https://engine.hyperbeam.com/v0/vm", {
         method: "POST",
         headers: {
@@ -26,9 +24,17 @@ export default {
         }),
       });
 
-      const data = await hbResponse.json();
+      const responseText = await hbResponse.text();
+      
+      // If Hyperbeam rejected the request, return the text so we can see why
+      if (!hbResponse.ok) {
+        return new Response(JSON.stringify({ error: `Hyperbeam error: ${responseText}` }), {
+          status: hbResponse.status,
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
 
-      // 3. Return the embed URL back to your frontend
+      const data = JSON.parse(responseText);
       return new Response(JSON.stringify(data), {
         headers: {
           "Content-Type": "application/json",
