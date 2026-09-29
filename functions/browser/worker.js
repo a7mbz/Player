@@ -21,12 +21,12 @@ export default {
         },
         body: JSON.stringify({
           start_url: "https://www.google.com",
+          offline_timeout: 60, // Automatically destroys the VM after 60 seconds of no active user
         }),
       });
 
       const responseText = await hbResponse.text();
       
-      // If Hyperbeam rejected the request, return the text so we can see why
       if (!hbResponse.ok) {
         return new Response(JSON.stringify({ error: `Hyperbeam error: ${responseText}` }), {
           status: hbResponse.status,
