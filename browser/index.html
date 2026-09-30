@@ -199,7 +199,7 @@
 (() => {
   // ---- Config ---------------------------------------------------------
   // Set your Worker address here, or leave empty and enter it in the page.
-  const DEFAULT_PROXY = "https://worker.bouziane-ahs.workers.dev/";
+  const DEFAULT_PROXY = "https://tk-66s.pages.dev/";
   const STORAGE_KEY = "toolkit.browser.proxy";
   const LOAD_TIMEOUT_MS = 20000;
 
@@ -255,28 +255,38 @@
   }
 
   // ---- Connect --------------------------------------------------------
-  async function connect(isRetry) {
+  let currentSessionId = "";
+
+  function endCurrentSession() {
+    if (!currentSessionId) return;
+    const api = normalize(getProxy());
+    const blob = new Blob([JSON.stringify({ session_id: currentSessionId })], { type: "application/json" });
+    try { navigator.sendBeacon(api + "session/end", blob); } catch {}
+    currentSessionId = "";
+  }
+
+  async function connect() {
     const api = normalize(getProxy());
     if (!api) { openSettings(); return; }
+    endCurrentSession(); // close any prior session before opening a new one
     setStatus("busy", "Starting session…");
     btnConnect.disabled = true;
     setOpenLinks("");
 
-    // Ask the Worker to create a Hyperbeam session and return its embed URL.
-    // A blocker or a slow network can fail the first attempt, so retry once
-    // silently before showing an error card.
+    // Ask the session service to create a Hyperbeam session and return its
+    // embed URL. One attempt only — retrying automatically on failure (e.g.
+    // a 429) just makes rate limiting worse.
     let embedUrl = "";
     try {
       const r = await fetch(api + "session", { method: "POST", cache: "no-store" });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(data.error || ("HTTP " + r.status));
       embedUrl = data.embed_url || "";
+      currentSessionId = data.session_id || "";
       if (!embedUrl.startsWith("https://")) throw new Error("No embed address returned");
     } catch (e) {
-      if (!isRetry) { setTimeout(() => connect(true), 1200); return; }
       btnConnect.disabled = false;
-      fail("Could not start a session", "The session service said: " + e.message +
-           ". If a browser extension is blocking requests, allow this site and reload.");
+      fail("Could not start a session", "The session service said: " + e.message + ".");
       return;
     }
 
@@ -346,14 +356,17 @@
   }));
 
   // ---- Init -------------------------------------------------------------
-  // Auto-connect the moment the tab is viewable; retry once if the page was
-  // still loading resources (helps when a blocker delays the first attempt).
+  // Auto-connect the moment the tab is viewable.
   function autoStart() {
     if (normalize(getProxy())) connect();
     else { showOverlay(ovSettings); proxyInput.value = ""; }
   }
   if (document.readyState === "complete") autoStart();
   else window.addEventListener("load", autoStart, { once: true });
+
+  // Only end the session when the page is actually being left/closed —
+  // not on a simple tab switch, which would interrupt playback for no reason.
+  window.addEventListener("pagehide", endCurrentSession);
 })();
 </script>
 </body>
