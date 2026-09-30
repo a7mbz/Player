@@ -131,42 +131,19 @@
 
     <!-- 5. MOVIES PLAYER -->
     <section class="panel" id="panel-movies">
-      <div class="panel-header">
-        <h1>Movies & Shows Player</h1>
-        <p>Search any movie or TV series by name and watch instantly.</p>
-      </div>
-      <div class="instrument">
-        <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
-        
-        <div class="movie-controls">
-          <input type="text" id="movieSearchInput" placeholder="Search movie or TV show name (e.g. Silo, Batman)...">
-          <select id="movieTypeSelect">
-            <option value="movie">Movie</option>
-            <option value="tv">TV Series</option>
-          </select>
-          <button type="button" id="searchMovieBtn">Search</button>
-        </div>
+  <div class="panel-header">
+    <h1>Movies & Shows Player</h1>
+    <p>Stream directly via FlyStream in full widescreen.</p>
+  </div>
+  <div class="instrument">
+    <div class="rivet-tl"></div><div class="rivet-tr"></div><div class="rivet-bl"></div><div class="rivet-br"></div>
 
-        <div id="searchResults" class="search-results-grid"></div>
-
-        <div class="tv-controls" id="tvControls" style="display: none;">
-          <input type="number" id="tvSeasonInput" placeholder="Season" value="1" min="1">
-          <input type="number" id="tvEpisodeInput" placeholder="Episode" value="1" min="1">
-          <button type="button" id="updateTvBtn">Update Episode</button>
-        </div>
-
-        <div class="movie-servers">
-          <span class="server-label">Servers:</span>
-          <button type="button" class="server-btn active" data-server="vidsrc">VidSrc</button>
-          <button type="button" class="server-btn" data-server="autoembed">AutoEmbed</button>
-          <button type="button" class="server-btn" data-server="embed2">2Embed</button>
-        </div>
-
-        <div class="video-container" id="moviePlayerContainer">
-          <iframe id="movieIframe" src="https://vidsrc.to/embed/movie/550" allowfullscreen></iframe>
-        </div>
-      </div>
-    </section>
+    <!-- Widescreen Player Container -->
+    <div class="video-container widescreen-player" id="moviePlayerContainer">
+      <iframe id="movieIframe" src="https://flystream.net/" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+    </div>
+  </div>
+</section>
 
   </main>
 </div>
