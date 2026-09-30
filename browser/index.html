@@ -160,7 +160,7 @@
   <div id="ovIdle" class="overlay show">
     <div class="card">
       <h2>Start a remote browser</h2>
-      <p>The browser runs on a remote server and streams to this page. Select Connect to start a session.</p>
+      <p>The browser runs on a remote server and streams to this page. It connects automatically.</p>
     </div>
   </div>
 
@@ -170,7 +170,7 @@
       <h2>Session service</h2>
       <p>Paste the address of your Cloudflare Worker. It starts the remote browser for you. The address is saved in this browser only.</p>
       <div class="field">
-        <input id="proxyInput" type="url" placeholder="https://hyperbeam-session.worker.bouziane-ahs.workers.dev/" autocomplete="off" spellcheck="false">
+        <input id="proxyInput" type="url" placeholder="https://hyperbeam-session.yourname.workers.dev/" autocomplete="off" spellcheck="false">
         <button id="btnSave" class="primary">Save</button>
         <button id="btnCancel">Cancel</button>
       </div>
@@ -199,7 +199,7 @@
 (() => {
   // ---- Config ---------------------------------------------------------
   // Set your Worker address here, or leave empty and enter it in the page.
-  const DEFAULT_PROXY = "";
+  const DEFAULT_PROXY = "https://worker.bouziane-ahs.workers.dev/";
   const STORAGE_KEY = "toolkit.browser.proxy";
   const LOAD_TIMEOUT_MS = 20000;
 
@@ -255,14 +255,16 @@
   }
 
   // ---- Connect --------------------------------------------------------
-  async function connect() {
+  async function connect(isRetry) {
     const api = normalize(getProxy());
     if (!api) { openSettings(); return; }
     setStatus("busy", "Starting session…");
     btnConnect.disabled = true;
     setOpenLinks("");
 
-    // Ask the Worker to create a Hyperbeam session and return its embed URL
+    // Ask the Worker to create a Hyperbeam session and return its embed URL.
+    // A blocker or a slow network can fail the first attempt, so retry once
+    // silently before showing an error card.
     let embedUrl = "";
     try {
       const r = await fetch(api + "session", { method: "POST", cache: "no-store" });
@@ -271,9 +273,10 @@
       embedUrl = data.embed_url || "";
       if (!embedUrl.startsWith("https://")) throw new Error("No embed address returned");
     } catch (e) {
+      if (!isRetry) { setTimeout(() => connect(true), 1200); return; }
       btnConnect.disabled = false;
       fail("Could not start a session", "The session service said: " + e.message +
-           ". Check the address under Session service, and that the Worker has your Hyperbeam key.");
+           ". If a browser extension is blocking requests, allow this site and reload.");
       return;
     }
 
@@ -342,8 +345,15 @@
     if (a.getAttribute("aria-disabled") === "true") e.preventDefault();
   }));
 
-  // ---- Init -----------------------------------------------------------
-  if (!normalize(getProxy())) { showOverlay(ovSettings); proxyInput.value = ""; }
+  // ---- Init -------------------------------------------------------------
+  // Auto-connect the moment the tab is viewable; retry once if the page was
+  // still loading resources (helps when a blocker delays the first attempt).
+  function autoStart() {
+    if (normalize(getProxy())) connect();
+    else { showOverlay(ovSettings); proxyInput.value = ""; }
+  }
+  if (document.readyState === "complete") autoStart();
+  else window.addEventListener("load", autoStart, { once: true });
 })();
 </script>
 </body>
