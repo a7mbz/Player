@@ -44,7 +44,11 @@ export async function onRequestPost({ request, env }) {
   try {
     res = await fetch('https://engine.hyperbeam.com/v0/vm', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${env.HYPERBEAM_KEY}` },
+      headers: {
+        Authorization: `Bearer ${env.HYPERBEAM_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
     });
   } catch {
     return json({ error: 'Could not reach Hyperbeam' }, 502, cors);
@@ -63,7 +67,8 @@ export async function onRequestPost({ request, env }) {
     );
   }
   if (!res.ok || !data.embed_url || !data.session_id) {
-    return json({ error: data.error || `Hyperbeam returned ${res.status}` }, 502, cors);
+    const reason = data.error || data.message || JSON.stringify(data) || res.statusText;
+    return json({ error: `Hyperbeam returned ${res.status}: ${reason}` }, 502, cors);
   }
 
   // Return embed_url (to display) and session_id (so the client can ask us to
