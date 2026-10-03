@@ -1,286 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Remote Browser · Toolkit</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --border: #334155;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    header {
-      background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border);
-      padding: 0.5rem 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      z-index: 10;
-    }
-    .brand { display: flex; align-items: center; gap: 0.75rem; }
-    .btn-back {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 1.25rem;
-    }
-    .btn-back:hover { color: var(--text); }
-    h1 { font-size: 1.1rem; font-weight: 600; }
-    .controls { display: flex; gap: 0.5rem; align-items: center; }
-    button {
-      background-color: var(--border);
-      color: var(--text);
-      border: none;
-      padding: 0.4rem 0.75rem;
-      border-radius: 0.375rem;
-      cursor: pointer;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.15s;
-    }
-    button:hover { background-color: #475569; }
-    button.primary { background-color: var(--primary); }
-    button.primary:hover { background-color: var(--primary-hover); }
-    
-    #status {
-      font-size: 0.85rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 0.25rem;
-      background: #020617;
-      color: #10b981;
-    }
-    #status.loading { color: #f59e0b; }
-    #status.error { color: #ef4444; }
-
-    main { flex: 1; position: relative; width: 100%; height: 100%; }
-    iframe { width: 100%; height: 100%; border: none; background: #000; }
-    
-    .overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(15, 23, 42, 0.95);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 5;
-    }
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 2rem;
-      border-radius: 0.75rem;
-      max-width: 450px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
-    }
-    .card h2 { margin-bottom: 0.75rem; font-size: 1.25rem; }
-    .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.5; }
-    
-    .field { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-    input {
-      flex: 1;
-      background-color: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.375rem;
-      outline: none;
-      font-size: 0.9rem;
-    }
-    input:focus { border-color: var(--primary); }
-    .hint { font-size: 0.8rem; color: var(--text-muted); text-align: left; }
-    code { background: #020617; padding: 0.1rem 0.3rem; border-radius: 0.25rem; }
-    
-    .hidden { display: none !important; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remote Browser · Toolkit</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --border: #334155;
+    --ok: #10b981;
+    --warn: #f59e0b;
+    --err: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: .5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    z-index: 10;
+  }
+  .brand { display: flex; align-items: center; gap: .75rem; }
+  .btn-back { color: var(--text-muted); text-decoration: none; font-size: 1.25rem; }
+  .btn-back:hover { color: var(--text); }
+  h1 { font-size: 1.1rem; font-weight: 600; }
+  .controls { display: flex; gap: .5rem; align-items: center; }
+  button {
+    background: var(--border);
+    color: var(--text);
+    border: none;
+    padding: .4rem .75rem;
+    border-radius: .375rem;
+    cursor: pointer;
+    font-size: .875rem;
+    font-weight: 500;
+  }
+  button:hover { background: #475569; }
+  button.primary { background: var(--primary); }
+  button.primary:hover { background: var(--primary-hover); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  #status { font-size: .85rem; padding: .2rem .5rem; border-radius: .25rem; background: #020617; color: var(--ok); }
+  #status.loading { color: var(--warn); }
+  #status.error { color: var(--err); }
+  main { flex: 1; position: relative; width: 100%; height: 100%; }
+  iframe { width: 100%; height: 100%; border: none; background: #000; }
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(15,23,42,.95);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    border-radius: .75rem;
+    max-width: 450px; width: 90%;
+    text-align: center;
+  }
+  .card h2 { margin-bottom: .75rem; font-size: 1.25rem; }
+  .card h2.err { color: var(--err); }
+  .card p { color: var(--text-muted); font-size: .95rem; margin-bottom: 1.5rem; line-height: 1.5; }
+  .hidden { display: none !important; }
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">
-      <a href="../" class="btn-back">←</a>
-      <h1>Remote Browser</h1>
-      <span id="status">Not connected</span>
+<header>
+  <div class="brand">
+    <a href="../" class="btn-back" aria-label="Back to Toolkit">←</a>
+    <h1>Remote Browser</h1>
+    <span id="status">Not connected</span>
+  </div>
+  <div class="controls">
+    <button id="btnConnect" class="primary">Connect</button>
+    <button id="btnReload" disabled>Reload</button>
+  </div>
+</header>
+
+<main>
+  <iframe id="frame" class="hidden" title="Remote browser"
+          allow="clipboard-read; clipboard-write; fullscreen; autoplay"></iframe>
+
+  <div id="ovStart" class="overlay">
+    <div class="card">
+      <h2>Start a remote browser</h2>
+      <p>Connects automatically. If it doesn't, select Connect.</p>
     </div>
-    <div class="controls">
-      <button id="btnConnect" class="primary">Connect</button>
-      <button id="btnReload">Reload</button>
-      <button id="btnSettings">Session service</button>
+  </div>
+
+  <div id="ovError" class="overlay hidden">
+    <div class="card">
+      <h2 class="err">Could not start session</h2>
+      <p id="errorText"></p>
+      <button id="btnRetry" class="primary">Try again</button>
     </div>
-  </header>
+  </div>
+</main>
 
-  <main>
-    <iframe id="frame" class="hidden" allow="clipboard-read; clipboard-write"></iframe>
+<script>
+(() => {
+  const statusEl = document.getElementById("status");
+  const frame = document.getElementById("frame");
+  const ovStart = document.getElementById("ovStart");
+  const ovError = document.getElementById("ovError");
+  const errorText = document.getElementById("errorText");
+  const btnConnect = document.getElementById("btnConnect");
+  const btnReload = document.getElementById("btnReload");
 
-    <!-- Overlay: Splash Screen -->
-    <div id="ovStart" class="overlay">
-      <div class="card">
-        <h2>Start a remote browser</h2>
-        <p>The browser runs on a isolated remote cloud instance and streams interactive output to this viewport panel safely.</p>
-        <button id="btnStartNow" class="primary" style="padding: 0.6rem 1.5rem; font-size: 1rem;">Launch Session</button>
-      </div>
-    </div>
+  let sessionId = "";
 
-    <!-- Overlay: Settings -->
-    <div id="ovSettings" class="overlay hidden">
-      <div class="card">
-        <h2>Session service</h2>
-        <p>Paste your Cloudflare Worker URL endpoint address below. This saves locally to your browser profile settings context only.</p>
-        <div class="field">
-          <input id="proxyInput" type="url" placeholder="https://worker.bouziane-ahs.workers.dev/" autocomplete="off" spellcheck="false">
-        </div>
-        <div style="display:flex; justify-content: flex-end; gap:0.5rem; margin-bottom:1rem;">
-          <button id="btnCancel">Cancel</button>
-          <button id="btnSave" class="primary">Save</button>
-        </div>
-        <div class="hint">Deploy <code>worker.js</code> configuration strings and ensure environment keys match correctly before launching.</div>
-      </div>
-    </div>
+  function setStatus(kind, text) {
+    statusEl.textContent = text;
+    statusEl.className = kind || "";
+  }
 
-    <!-- Overlay: Error Panel -->
-    <div id="ovError" class="overlay hidden">
-      <div class="card">
-        <h2 style="color:#ef4444;">Could not start session</h2>
-        <p id="errorText">Failed to connect to backend session worker process instance context rules.</p>
-        <button id="btnErrorClose">Dismiss</button>
-      </div>
-    </div>
-  </main>
+  function endSession() {
+    if (!sessionId) return;
+    const blob = new Blob([JSON.stringify({ session_id: sessionId })], { type: "application/json" });
+    try { navigator.sendBeacon("/session/end", blob); } catch {}
+    sessionId = "";
+  }
 
-  <script>
-    // Configuration values setup configuration variables
-    const DEFAULT_PROXY = "https://worker.bouziane-ahs.workers.dev/";
-    const STORAGE_KEY = "toolkit.browser.proxy";
-    
-    let currentSessionId = "";
+  async function connect() {
+    endSession();
+    setStatus("loading", "Connecting…");
+    ovStart.classList.add("hidden");
+    ovError.classList.add("hidden");
+    btnConnect.disabled = true;
+    btnReload.disabled = true;
 
-    function getProxy() {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? stored.trim() : DEFAULT_PROXY;
+    try {
+      // Same-origin call: no external domain involved from the browser's side.
+      const r = await fetch("/session", { method: "POST", cache: "no-store" });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || `Server returned ${r.status}`);
+      if (!data.embed_url) throw new Error("No session address returned");
+
+      sessionId = data.session_id || "";
+      frame.src = data.embed_url;
+      frame.classList.remove("hidden");
+      setStatus("", "Connected");
+      btnReload.disabled = false;
+      btnConnect.textContent = "New session";
+    } catch (err) {
+      setStatus("error", "Error");
+      frame.classList.add("hidden");
+      errorText.textContent = err.message || "Could not reach the session service.";
+      ovError.classList.remove("hidden");
+    } finally {
+      btnConnect.disabled = false;
     }
+  }
 
-    function cleanUrl(url) {
-      try {
-        let u = url.trim();
-        if (!u.startsWith("http://") && !u.startsWith("https://")) {
-          u = "https://" + u;
-        }
-        const parsed = new URL(u);
-        let origin = parsed.origin;
-        if (!origin.endsWith("/")) origin += "/";
-        return origin;
-      } catch {
-        return DEFAULT_PROXY;
-      }
-    }
-
-    // UI elements lookup declarations selectors
-    const elStatus = document.getElementById("status");
-    const elFrame = document.getElementById("frame");
-    const ovStart = document.getElementById("ovStart");
-    const ovSettings = document.getElementById("ovSettings");
-    const ovError = document.getElementById("ovError");
-    const elErrorText = document.getElementById("errorText");
-    const proxyInput = document.getElementById("proxyInput");
-
-    // Operations control logic sequence handlers
-    async function connect() {
-      elStatus.innerText = "Connecting...";
-      elStatus.className = "loading";
-      ovStart.classList.add("hidden");
-      ovError.classList.add("hidden");
-
-      const baseProxy = cleanUrl(getProxy());
-      const endpoint = baseProxy + "session";
-
-      try {
-        const response = await fetch(endpoint, {
-          method: "POST",
-          cache: "no-store",
-          headers: { "Content-Type": "application/json" }
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(data.error || `HTTP error server status: ${response.status}`);
-        }
-
-        if (!data.embed_url) {
-          throw new Error("Missing link context reference string data structures from backend stream container.");
-        }
-
-        currentSessionId = data.session_id || "active-session";
-        elStatus.innerText = "Connected";
-        elStatus.className = "";
-        
-        elFrame.src = data.embed_url;
-        elFrame.classList.remove("hidden");
-
-      } catch (err) {
-        elStatus.innerText = "Error";
-        elStatus.className = "error";
-        elFrame.classList.add("hidden");
-        ovStart.classList.remove("hidden");
-        ovError.classList.remove("hidden");
-        elErrorText.innerText = err.message || "Failed to initialize active proxy instance stream operations data channels.";
-      }
-    }
-
-    // Setup event handlers configurations bindings
-    document.getElementById("btnConnect").addEventListener("click", connect);
-    document.getElementById("btnStartNow").addEventListener("click", connect);
-    
-    document.getElementById("btnReload").addEventListener("click", () => {
-      if (!elFrame.classList.contains("hidden")) {
-        const src = elFrame.src;
-        elFrame.src = "";
-        elFrame.src = src;
-      } else {
-        connect();
-      }
-    });
-
-    document.getElementById("btnSettings").addEventListener("click", () => {
-      proxyInput.value = getProxy();
-      ovSettings.classList.remove("hidden");
-    });
-
-    document.getElementById("btnCancel").addEventListener("click", () => {
-      ovSettings.classList.add("hidden");
-    });
-
-    document.getElementById("btnSave").addEventListener("click", () => {
-      let val = proxyInput.value.trim();
-      if (!val) {
-        localStorage.removeItem(STORAGE_KEY);
-      } else {
-        localStorage.setItem(STORAGE_KEY, cleanUrl(val));
-      }
-      ovSettings.classList.add("hidden");
+  btnConnect.addEventListener("click", connect);
+  document.getElementById("btnRetry").addEventListener("click", connect);
+  btnReload.addEventListener("click", () => {
+    if (!frame.classList.contains("hidden")) {
+      const src = frame.src;
+      frame.src = "";
+      frame.src = src;
+    } else {
       connect();
-    });
+    }
+  });
+  window.addEventListener("pagehide", endSession);
 
-    document.getElementById("btnErrorClose").addEventListener("click", () => {
-      ovError.classList.add("hidden");
-    });
-  </script>
+  // Auto-connect on load.
+  if (document.readyState === "complete") connect();
+  else window.addEventListener("load", connect, { once: true });
+})();
+</script>
 </body>
 </html>
