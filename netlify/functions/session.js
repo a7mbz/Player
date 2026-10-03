@@ -1,43 +1,51 @@
-// Cloudflare Pages Function — POST /session
-// Same-origin only: the browser never calls Hyperbeam directly, and this
-// Function never receives cross-site requests, so no CORS handling is needed.
-// Setup: Pages project > Settings > Environment variables > add HYPERBEAM_KEY
-// (type Secret), then redeploy.
 
-const json = (body, status) =>
-  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
-
-export async function onRequestPost({ request, env }) {
-  if (!env.HYPERBEAM_KEY) {
-    return json({ error: "HYPERBEAM_KEY secret is not set on the Pages project" }, 500);
+exports.handler = async function(event, context) {
+  if (event.httpMethod !== "POST") {
+    return { 
+      statusCode: 405, 
+      body: JSON.stringify({ error: "Method not allowed" }) 
+    };
   }
 
-  let res;
+  const apiKey = process.env.HYPERBEAM_KEY;
+  if (!apiKey) {
+    return { 
+      statusCode: 500, 
+      body: JSON.stringify({ error: "HYPERBEAM_KEY secret is not set on Netlify" }) 
+    };
+  }
+
   try {
-    res = await fetch("https://engine.hyperbeam.com/v0/vm", {
+    const response = await fetch("https://engine.hyperbeam.com/v0/vm", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${env.HYPERBEAM_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: "{}",
+      body: JSON.stringify({}),
     });
-  } catch {
-    return json({ error: "Could not reach the session service" }, 502);
-  }
 
-  const data = await res.json().catch(() => ({}));
+    const data = await response.json();
 
-  if (res.status === 429) {
-    const retryAfter = res.headers.get("Retry-After");
-    return json(
-      { error: `Too many sessions right now${retryAfter ? ` — retry in ${retryAfter}s` : ""}` },
-      429
-    );
-  }
-  if (!res.ok || !data.embed_url || !data.session_id) {
-    return json({ error: data.error || data.message || "Could not start the session" }, 502);
-  }
+    if (!response.ok || !data.embed_url || !data.session_id) {
+      return { 
+        statusCode: 502, 
+        body: JSON.stringify({ error: data.error || data.message || "Could not start the session" }) 
+      };
+    }
 
-  return json({ embed_url: data.embed_url, session_id: data.session_id }, 200);
-}
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        embed_url: data.embed_url, 
+        session_id: data.session_id 
+      }),
+    };
+  } catch (err) {
+    return { 
+      statusCode: 502, 
+      body: JSON.stringify({ error: "Could not reach the session service" }) 
+    };
+  }
+};
