@@ -1,0 +1,8 @@
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/session"
+  to = "/.netlify/functions/session"
+  status = 200
+  force = true
