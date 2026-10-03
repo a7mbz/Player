@@ -1,18 +1,11 @@
-
 exports.handler = async function(event, context) {
   if (event.httpMethod !== "POST") {
-    return { 
-      statusCode: 405, 
-      body: JSON.stringify({ error: "Method not allowed" }) 
-    };
+    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
   const apiKey = process.env.HYPERBEAM_KEY;
   if (!apiKey) {
-    return { 
-      statusCode: 500, 
-      body: JSON.stringify({ error: "HYPERBEAM_KEY secret is not set on Netlify" }) 
-    };
+    return { statusCode: 500, body: JSON.stringify({ error: "HYPERBEAM_KEY secret is not set" }) };
   }
 
   try {
@@ -28,24 +21,15 @@ exports.handler = async function(event, context) {
     const data = await response.json();
 
     if (!response.ok || !data.embed_url || !data.session_id) {
-      return { 
-        statusCode: 502, 
-        body: JSON.stringify({ error: data.error || data.message || "Could not start the session" }) 
-      };
+      return { statusCode: 502, body: JSON.stringify({ error: data.error || "Could not start the session" }) };
     }
 
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        embed_url: data.embed_url, 
-        session_id: data.session_id 
-      }),
+      body: JSON.stringify({ embed_url: data.embed_url, session_id: data.session_id }),
     };
   } catch (err) {
-    return { 
-      statusCode: 502, 
-      body: JSON.stringify({ error: "Could not reach the session service" }) 
-    };
+    return { statusCode: 502, body: JSON.stringify({ error: "Could not reach session service" }) };
   }
 };
